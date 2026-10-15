@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: tempo
+      POSTGRES_USER: tempo
+      POSTGRES_PASSWORD: tempo_dev
+    ports: ["5432:5432"]
+    volumes:
+      - tempo-postgres:/var/lib/postgresql/data
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+volumes:
+  tempo-postgres:

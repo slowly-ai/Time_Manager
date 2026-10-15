@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+.env
+.env.*
+!.env.example
+.idea/
+.vscode/
+*.log
+target/
+coverage/
+apps/desktop/src-tauri/gen/

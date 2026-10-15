@@ -1,0 +1,18 @@
+{
+  "name": "tempo-event-timer",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @tempo/desktop",
+    "build": "npm run build -w @tempo/domain && npm run build -w @tempo/desktop && npm run build -w @tempo/api",
+    "test": "npm run test -w @tempo/domain",
+    "lint": "npm run lint -w @tempo/desktop"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
