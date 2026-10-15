@@ -1,63 +1,98 @@
-export type EventStatus = 'active' | 'archived'
+export type TaskStatus = 'todo' | 'running' | 'done'
+export type Priority = 'low' | 'medium' | 'high'
+export type TimerMode = 'stopwatch' | 'pomodoro'
+export type PomodoroPhase = 'focus' | 'short_break' | 'long_break'
 export type SessionStatus = 'running' | 'paused' | 'completed' | 'cancelled'
 
-export interface TempoEvent {
+export interface Project {
+  id: string
+  name: string
+  color: string
+  archived: boolean
+  createdAt: string
+}
+
+export interface Task {
   id: string
   title: string
   description: string
-  category: string
-  color: string
-  status: EventStatus
+  projectId: string
+  priority: Priority
+  status: TaskStatus
+  plannedMs: number
+  dueDate?: string
+  sortOrder: number
   createdAt: string
   updatedAt: string
-  totalMs: number
-  lastSessionAt?: string
+  completedAt?: string
 }
 
-export interface TempoSession {
+export interface FocusSession {
   id: string
-  eventId: string
+  taskId: string
+  projectId: string
+  mode: TimerMode
+  phase: PomodoroPhase
+  pomodoroIndex: number
   startedAt: string
   endedAt?: string
   pausedAt?: string
-  elapsedMs: number
+  accumulatedMs: number
   status: SessionStatus
-  note?: string
 }
 
-export interface StoreState {
-  events: TempoEvent[]
-  sessions: TempoSession[]
-  allowParallel: boolean
+export interface Settings {
   theme: 'light' | 'dark' | 'system'
-  timezone: string
+  defaultMode: TimerMode
+  focusMinutes: number
+  shortBreakMinutes: number
+  longBreakMinutes: number
+  longBreakEvery: number
+  autoStartBreak: boolean
+  dailyGoalMs: number
+  switchBehavior: 'pause' | 'complete'
 }
 
-const STORAGE_KEY = 'tempo-store-v1'
+export interface ChronoState {
+  projects: Project[]
+  tasks: Task[]
+  sessions: FocusSession[]
+  settings: Settings
+}
 
-const seedEvents: TempoEvent[] = [
-  { id: 'deep-work', title: '深度工作', description: '需要完整注意力的创作与研究时间', category: '工作', color: '#86a9ff', status: 'active', createdAt: '2026-10-12T01:00:00.000Z', updatedAt: '2026-10-15T01:30:00.000Z', totalMs: 3_726_000, lastSessionAt: '2026-10-15T01:30:00.000Z' },
-  { id: 'reading', title: '阅读与输入', description: '书籍、文章和课程的阅读时间', category: '成长', color: '#8fceb7', status: 'active', createdAt: '2026-10-11T08:00:00.000Z', updatedAt: '2026-10-14T12:20:00.000Z', totalMs: 2_916_000, lastSessionAt: '2026-10-14T12:20:00.000Z' },
-  { id: 'exercise', title: '运动', description: '训练、散步和身体恢复', category: '生活', color: '#efb477', status: 'active', createdAt: '2026-10-09T11:00:00.000Z', updatedAt: '2026-10-13T10:10:00.000Z', totalMs: 1_830_000, lastSessionAt: '2026-10-13T10:10:00.000Z' },
-  { id: 'planning', title: '每周规划', description: '整理任务、回顾和安排下一步', category: '工作', color: '#b59bdc', status: 'active', createdAt: '2026-10-10T04:00:00.000Z', updatedAt: '2026-10-12T03:00:00.000Z', totalMs: 1_254_000, lastSessionAt: '2026-10-12T03:00:00.000Z' },
-]
+const STORAGE_KEY = 'chronodesk-store-v2'
 
-const initialState: StoreState = { events: seedEvents, sessions: [], allowParallel: false, theme: 'light', timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Shanghai' }
+export const defaultSettings: Settings = {
+  theme: 'light', defaultMode: 'stopwatch', focusMinutes: 25, shortBreakMinutes: 5,
+  longBreakMinutes: 15, longBreakEvery: 4, autoStartBreak: false, dailyGoalMs: 8 * 60 * 60 * 1000, switchBehavior: 'pause',
+}
 
-export function loadStore(): StoreState {
+export const defaultState: ChronoState = { projects: [], tasks: [], sessions: [], settings: defaultSettings }
+
+export function loadState(): ChronoState {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return initialState
-    return { ...initialState, ...JSON.parse(raw) }
-  } catch {
-    return initialState
-  }
+    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null')
+    if (!parsed) return defaultState
+    return { ...defaultState, ...parsed, settings: { ...defaultSettings, ...parsed.settings } }
+  } catch { return defaultState }
 }
 
-export function saveStore(state: StoreState) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+export function saveState(state: ChronoState) { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)) }
+
+export function createId(prefix: string) { return `${prefix}-${crypto.randomUUID?.() ?? Math.random().toString(36).slice(2)}` }
+
+export function sessionElapsed(session: FocusSession, now = Date.now()) {
+  if (session.status !== 'running') return Math.max(0, session.accumulatedMs)
+  return Math.max(0, session.accumulatedMs + now - new Date(session.startedAt).getTime())
 }
 
-export function id(prefix: string) {
-  return `${prefix}-${crypto.randomUUID?.() ?? Math.random().toString(36).slice(2)}`
+export function formatDuration(ms: number, includeHours = true) {
+  const seconds = Math.max(0, Math.floor(ms / 1000))
+  const hours = Math.floor(seconds / 3600)
+  const minutes = Math.floor((seconds % 3600) / 60)
+  const rest = seconds % 60
+  if (includeHours || hours > 0) return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(rest).padStart(2, '0')}`
+  return `${String(minutes).padStart(2, '0')}:${String(rest).padStart(2, '0')}`
 }
+
+export function isFocusSession(session: FocusSession) { return session.phase === 'focus' }
