@@ -8,6 +8,8 @@
   ],
   "scripts": {
     "dev": "npm run dev -w @tempo/desktop",
+    "desktop:dev": "npm run tauri:dev -w @tempo/desktop",
+    "desktop:build": "npm run tauri:build -w @tempo/desktop",
     "build": "npm run build -w @tempo/domain && npm run build -w @tempo/desktop && npm run build -w @tempo/api",
     "test": "npm run test -w @tempo/domain",
     "lint": "npm run lint -w @tempo/desktop"

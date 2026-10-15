@@ -16,6 +16,35 @@ npm run dev
 
 当前核心数据保存在本地浏览器存储中，支持 JSON 导出；安装 Rust 后可使用 `src-tauri` 构建 Windows 安装包。
 
+## Windows 桌面运行与打包
+
+项目使用 Tauri 2。需要先安装：
+
+1. Visual Studio 2022 Build Tools，勾选 `Desktop development with C++` 和 Windows SDK。
+2. Rust MSVC 工具链：
+
+```powershell
+winget install --id Rustlang.Rustup
+rustup default stable-msvc
+```
+
+安装后重新打开终端，确认 `rustc --version` 和 `cargo --version` 可用。
+
+```powershell
+npm install
+npm run desktop:dev
+npm run desktop:build
+```
+
+开发模式会打开桌面窗口。打包完成后，安装包位于：
+
+```text
+apps/desktop/src-tauri/target/release/bundle/nsis/
+apps/desktop/src-tauri/target/release/bundle/msi/
+```
+
+Windows 10 1803 及以上和 Windows 11 通常已经包含 WebView2；如果构建或运行时提示缺失，需要安装 Microsoft Edge WebView2 Runtime。
+
 ## 页面
 
 - 今日工作台：任务清单、目标进度和当前专注。

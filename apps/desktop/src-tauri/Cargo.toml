@@ -1,8 +1,8 @@
 [package]
-name = "tempo"
+name = "chronodesk"
 version = "0.1.0"
-description = "Tempo desktop timer"
-authors = ["Tempo"]
+description = "ChronoDesk personal productivity timer"
+authors = ["ChronoDesk"]
 edition = "2021"
 
 [build-dependencies]
