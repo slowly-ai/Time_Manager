@@ -14,13 +14,15 @@ npm install
 npm run dev
 ```
 
-当前核心数据保存在本地浏览器存储中，支持 JSON 导出；安装 Rust 后可使用 `src-tauri` 构建 Windows 安装包。
+当前核心数据保存在本地应用存储中，支持 JSON 导出。联网不是启动应用的前置条件；联网只用于后续接入云端同步。
+
+`npm run dev` 仅用于浏览器开发预览，`npm run desktop:dev` 仅用于桌面开发调试。普通用户应安装构建出的 Windows 安装包，之后从开始菜单或桌面快捷方式直接打开 `ChronoDesk`，无需 Node.js、终端命令或网络连接。
 
 ## Windows 桌面运行与打包
 
 项目使用 Tauri 2。需要先安装：
 
-1. Visual Studio 2022 Build Tools，勾选 `Desktop development with C++` 和 Windows SDK。
+1. Visual Studio Community 或 Build Tools，勾选 `Desktop development with C++` 和 Windows SDK。
 2. Rust MSVC 工具链：
 
 ```powershell
@@ -36,12 +38,16 @@ npm run desktop:dev
 npm run desktop:build
 ```
 
+`desktop:build` 会生成包含 WebView2 离线运行时的安装包。安装包首次安装不依赖网络，但体积会比在线引导安装器更大。
+
 开发模式会打开桌面窗口。打包完成后，安装包位于：
 
 ```text
 apps/desktop/src-tauri/target/release/bundle/nsis/
 apps/desktop/src-tauri/target/release/bundle/msi/
 ```
+
+优先分发 `nsis` 目录中的 `.exe` 安装程序。用户安装一次后，可以直接从 Windows 开始菜单启动应用；升级时再安装新版本即可。
 
 Windows 10 1803 及以上和 Windows 11 通常已经包含 WebView2；如果构建或运行时提示缺失，需要安装 Microsoft Edge WebView2 Runtime。
 
