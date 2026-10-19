@@ -564,7 +564,64 @@ body,
   stroke-width: 2.2;
 }
 
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page {
+  animation: page-enter .18s cubic-bezier(.2, .7, .2, 1);
+}
+
+.theme-segmented button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.theme-segmented svg {
+  stroke-width: 2;
+}
+
+.primary-button:hover,
+.wide-start:hover {
+  background: color-mix(in srgb, var(--accent) 84%, #000);
+}
+
+.priority.high {
+  background: color-mix(in srgb, var(--danger) 12%, var(--surface));
+}
+
+.priority.medium {
+  background: color-mix(in srgb, var(--warning) 13%, var(--surface));
+}
+
+.choice-row button.active {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .page {
+    animation: none;
+  }
+
+  button,
+  input,
+  select,
+  .task-row,
+  .project-card,
+  .row-start,
+  .progress-track i {
+    transition: none !important;
+  }
+
   .brand-mark svg,
   .nav-item svg,
   .icon-button svg,
