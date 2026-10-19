@@ -1,0 +1,350 @@
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
+.app-shell {
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.topbar {
+  flex: 0 0 68px;
+}
+
+.page {
+  width: 100%;
+  height: calc(100vh - 68px);
+  min-height: 0;
+  padding: 22px 38px 14px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.page::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.page-heading {
+  margin-bottom: 18px;
+}
+
+.page-heading.compact {
+  margin-bottom: 18px;
+}
+
+.page h1 {
+  margin-top: 7px;
+  margin-bottom: 6px;
+  font-size: 26px;
+}
+
+.daily-metrics {
+  margin-bottom: 20px;
+}
+
+.metric {
+  min-height: 78px;
+  padding: 14px;
+}
+
+.today-layout {
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.empty-state {
+  padding-top: 38px;
+  padding-bottom: 38px;
+}
+
+.focus-panel {
+  padding: 14px 16px;
+}
+
+.timer-tabs {
+  margin-top: 12px;
+}
+
+.big-timer {
+  padding: 16px 0 14px;
+  font-size: 36px;
+}
+
+.focus-hint {
+  margin-top: 8px;
+}
+
+.progress-strip {
+  padding: 14px 16px;
+}
+
+/* Keep the information hierarchy readable at the compact desktop size. */
+.brand span,
+.sidebar-empty,
+.sidebar-bottom small {
+  font-size: 10px;
+}
+
+.nav-item {
+  font-size: 13px;
+}
+
+.nav-item em,
+.data-status,
+.project-link {
+  font-size: 11px;
+}
+
+.breadcrumbs,
+.top-search input,
+.primary-button,
+.secondary-button,
+.pause-button,
+.finish-button,
+.wide-start,
+.danger-button,
+.text-button {
+  font-size: 12px;
+}
+
+.top-search kbd,
+.eyebrow {
+  font-size: 10px;
+}
+
+.page h1 {
+  font-size: 28px;
+}
+
+.page-heading p {
+  font-size: 13px;
+}
+
+.metric span,
+.section-heading span,
+.focus-context,
+.task-main span,
+.detail-title span,
+.detail-panel p,
+.history-summary span,
+.stat-card span,
+.data-note,
+.setting-heading span,
+.setting-row span,
+.distribution-row,
+.history-row,
+.project-card > span:not(.project-card-top) {
+  font-size: 11px;
+}
+
+.metric small,
+.section-heading h3,
+.priority,
+.task-time,
+.detail-stats span,
+.mini-session span,
+.mini-session b,
+.history-head,
+.stat-card small,
+.history-summary small,
+.bar-column small,
+.chart-empty,
+.form-label,
+.number-field span,
+.choice-row button {
+  font-size: 10px;
+}
+
+.metric strong {
+  font-size: 22px;
+}
+
+.section-heading h2 {
+  font-size: 16px;
+}
+
+.task-main strong {
+  font-size: 13px;
+}
+
+.focus-panel h2 {
+  font-size: 19px;
+}
+
+.timer-tabs button,
+.segmented button {
+  font-size: 11px;
+}
+
+.big-timer {
+  font-family: 'DM Mono', Consolas, monospace;
+  font-size: 38px;
+}
+
+.focus-hint,
+.empty-state span {
+  font-size: 10px;
+}
+
+.empty-state strong {
+  font-size: 13px;
+}
+
+/* Second readability pass: prioritize comfortable reading over dense labels. */
+.page {
+  padding-top: 18px;
+  padding-bottom: 10px;
+}
+
+.page-heading,
+.page-heading.compact {
+  margin-bottom: 14px;
+}
+
+.brand span,
+.sidebar-empty,
+.sidebar-bottom small,
+.top-search kbd,
+.eyebrow {
+  font-size: 11px;
+}
+
+.nav-item {
+  font-size: 14px;
+}
+
+.nav-item em,
+.data-status,
+.project-link,
+.breadcrumbs,
+.top-search input,
+.primary-button,
+.secondary-button,
+.pause-button,
+.finish-button,
+.wide-start,
+.danger-button,
+.text-button {
+  font-size: 13px;
+}
+
+.page h1 {
+  font-size: 30px;
+}
+
+.page-heading p {
+  font-size: 14px;
+}
+
+.daily-metrics {
+  margin-bottom: 16px;
+}
+
+.metric {
+  min-height: 72px;
+  padding: 12px;
+}
+
+.metric span,
+.section-heading span,
+.focus-context,
+.task-main span,
+.detail-title span,
+.detail-panel p,
+.history-summary span,
+.stat-card span,
+.data-note,
+.setting-heading span,
+.setting-row span,
+.distribution-row,
+.history-row,
+.project-card > span:not(.project-card-top) {
+  font-size: 12px;
+}
+
+.metric small,
+.section-heading h3,
+.priority,
+.task-time,
+.detail-stats span,
+.mini-session span,
+.mini-session b,
+.history-head,
+.stat-card small,
+.history-summary small,
+.bar-column small,
+.chart-empty,
+.form-label,
+.number-field span,
+.choice-row button,
+.focus-hint,
+.empty-state span {
+  font-size: 11px;
+}
+
+.metric strong {
+  font-size: 24px;
+}
+
+.section-heading h2 {
+  font-size: 18px;
+}
+
+.task-main strong {
+  font-size: 14px;
+}
+
+.focus-panel h2 {
+  font-size: 20px;
+}
+
+.today-layout {
+  gap: 18px;
+  margin-bottom: 12px;
+}
+
+.empty-state {
+  padding-top: 25px;
+  padding-bottom: 25px;
+}
+
+.focus-panel {
+  padding: 12px 14px;
+}
+
+.timer-tabs {
+  margin-top: 9px;
+}
+
+.timer-tabs button,
+.segmented button {
+  font-size: 12px;
+}
+
+.big-timer {
+  padding: 12px 0 10px;
+  font-size: 40px;
+}
+
+.progress-strip {
+  padding: 12px 14px;
+}
+
+.empty-state strong {
+  font-size: 14px;
+}
