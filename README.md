@@ -26,8 +26,21 @@ npm run dev
 2. Rust MSVC 工具链：
 
 ```powershell
-winget install --id Rustlang.Rustup
-rustup default stable-msvc
+$rustupHome = 'G:\开发工具\Rustup'
+$cargoHome = 'G:\开发工具\Cargo'
+[Environment]::SetEnvironmentVariable('RUSTUP_HOME', $rustupHome, 'User')
+[Environment]::SetEnvironmentVariable('CARGO_HOME', $cargoHome, 'User')
+$env:RUSTUP_HOME = $rustupHome
+$env:CARGO_HOME = $cargoHome
+Invoke-WebRequest 'https://win.rustup.rs/x86_64' -OutFile 'G:\开发工具\rustup-init.exe'
+& 'G:\开发工具\rustup-init.exe' -y --default-toolchain stable-msvc --profile minimal
+```
+
+如果官方源连接不稳定，可以在安装前使用 Rust 镜像：
+
+```powershell
+[Environment]::SetEnvironmentVariable('RUSTUP_DIST_SERVER', 'https://rsproxy.cn', 'User')
+[Environment]::SetEnvironmentVariable('RUSTUP_UPDATE_ROOT', 'https://rsproxy.cn/rustup', 'User')
 ```
 
 安装后重新打开终端，确认 `rustc --version` 和 `cargo --version` 可用。
