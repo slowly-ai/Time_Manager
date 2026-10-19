@@ -465,9 +465,9 @@ body,
   width: 31px;
   height: 31px;
   overflow: hidden;
-  background: #fff;
-  border-radius: 9px;
-  box-shadow: 0 5px 12px color-mix(in srgb, var(--accent) 22%, transparent);
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .brand-logo {
