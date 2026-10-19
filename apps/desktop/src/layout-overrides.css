@@ -92,3 +92,115 @@ body,
 .progress-strip {
   padding: 14px 16px;
 }
+
+/* Keep the information hierarchy readable at the compact desktop size. */
+.brand span,
+.sidebar-empty,
+.sidebar-bottom small {
+  font-size: 10px;
+}
+
+.nav-item {
+  font-size: 13px;
+}
+
+.nav-item em,
+.data-status,
+.project-link {
+  font-size: 11px;
+}
+
+.breadcrumbs,
+.top-search input,
+.primary-button,
+.secondary-button,
+.pause-button,
+.finish-button,
+.wide-start,
+.danger-button,
+.text-button {
+  font-size: 12px;
+}
+
+.top-search kbd,
+.eyebrow {
+  font-size: 10px;
+}
+
+.page h1 {
+  font-size: 28px;
+}
+
+.page-heading p {
+  font-size: 13px;
+}
+
+.metric span,
+.section-heading span,
+.focus-context,
+.task-main span,
+.detail-title span,
+.detail-panel p,
+.history-summary span,
+.stat-card span,
+.data-note,
+.setting-heading span,
+.setting-row span,
+.distribution-row,
+.history-row,
+.project-card > span:not(.project-card-top) {
+  font-size: 11px;
+}
+
+.metric small,
+.section-heading h3,
+.priority,
+.task-time,
+.detail-stats span,
+.mini-session span,
+.mini-session b,
+.history-head,
+.stat-card small,
+.history-summary small,
+.bar-column small,
+.chart-empty,
+.form-label,
+.number-field span,
+.choice-row button {
+  font-size: 10px;
+}
+
+.metric strong {
+  font-size: 22px;
+}
+
+.section-heading h2 {
+  font-size: 16px;
+}
+
+.task-main strong {
+  font-size: 13px;
+}
+
+.focus-panel h2 {
+  font-size: 19px;
+}
+
+.timer-tabs button,
+.segmented button {
+  font-size: 11px;
+}
+
+.big-timer {
+  font-family: 'DM Mono', Consolas, monospace;
+  font-size: 38px;
+}
+
+.focus-hint,
+.empty-state span {
+  font-size: 10px;
+}
+
+.empty-state strong {
+  font-size: 13px;
+}
