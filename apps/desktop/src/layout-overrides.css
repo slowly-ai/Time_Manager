@@ -1,0 +1,54 @@
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
+.app-shell {
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.topbar {
+  flex: 0 0 68px;
+}
+
+.page {
+  width: 100%;
+  height: calc(100vh - 68px);
+  min-height: 0;
+  padding: 30px 43px 20px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.page::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.page-heading {
+  margin-bottom: 24px;
+}
+
+.page-heading.compact {
+  margin-bottom: 22px;
+}
+
+.daily-metrics {
+  margin-bottom: 26px;
+}
+
+.today-layout {
+  margin-bottom: 20px;
+}
