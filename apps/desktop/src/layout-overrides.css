@@ -27,28 +27,68 @@ body,
   width: 100%;
   height: calc(100vh - 68px);
   min-height: 0;
-  padding: 30px 43px 20px;
+  padding: 22px 38px 14px;
   overflow-y: auto;
   scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .page::-webkit-scrollbar {
+  display: none;
   width: 0;
   height: 0;
 }
 
 .page-heading {
-  margin-bottom: 24px;
+  margin-bottom: 18px;
 }
 
 .page-heading.compact {
-  margin-bottom: 22px;
+  margin-bottom: 18px;
+}
+
+.page h1 {
+  margin-top: 7px;
+  margin-bottom: 6px;
+  font-size: 26px;
 }
 
 .daily-metrics {
-  margin-bottom: 26px;
+  margin-bottom: 20px;
+}
+
+.metric {
+  min-height: 78px;
+  padding: 14px;
 }
 
 .today-layout {
-  margin-bottom: 20px;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.empty-state {
+  padding-top: 38px;
+  padding-bottom: 38px;
+}
+
+.focus-panel {
+  padding: 14px 16px;
+}
+
+.timer-tabs {
+  margin-top: 12px;
+}
+
+.big-timer {
+  padding: 16px 0 14px;
+  font-size: 36px;
+}
+
+.focus-hint {
+  margin-top: 8px;
+}
+
+.progress-strip {
+  padding: 14px 16px;
 }
