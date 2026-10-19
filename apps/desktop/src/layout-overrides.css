@@ -348,3 +348,225 @@ body,
 .empty-state strong {
   font-size: 14px;
 }
+
+/* Final type scale and expressive icon treatment for desktop readability. */
+.page {
+  padding-top: 14px;
+}
+
+.page h1 {
+  font-size: 32px;
+}
+
+.page-heading p {
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.nav-item {
+  font-size: 15px;
+}
+
+.nav-item em,
+.data-status,
+.project-link,
+.breadcrumbs,
+.top-search input,
+.primary-button,
+.secondary-button,
+.pause-button,
+.finish-button,
+.wide-start,
+.danger-button,
+.text-button {
+  font-size: 14px;
+}
+
+.brand span,
+.sidebar-empty,
+.sidebar-bottom small,
+.top-search kbd,
+.eyebrow {
+  font-size: 12px;
+}
+
+.metric {
+  min-height: 68px;
+  padding: 10px 12px;
+}
+
+.metric span,
+.section-heading span,
+.focus-context,
+.task-main span,
+.detail-title span,
+.detail-panel p,
+.history-summary span,
+.stat-card span,
+.data-note,
+.setting-heading span,
+.setting-row span,
+.distribution-row,
+.history-row,
+.project-card > span:not(.project-card-top) {
+  font-size: 13px;
+}
+
+.metric small,
+.section-heading h3,
+.priority,
+.task-time,
+.detail-stats span,
+.mini-session span,
+.mini-session b,
+.history-head,
+.stat-card small,
+.history-summary small,
+.bar-column small,
+.chart-empty,
+.form-label,
+.number-field span,
+.choice-row button,
+.focus-hint,
+.empty-state span {
+  font-size: 12px;
+}
+
+.metric strong {
+  font-size: 26px;
+}
+
+.section-heading h2 {
+  font-size: 19px;
+}
+
+.task-main strong {
+  font-size: 15px;
+}
+
+.focus-panel h2 {
+  font-size: 21px;
+}
+
+.timer-tabs button,
+.segmented button {
+  font-size: 13px;
+}
+
+.big-timer {
+  font-size: 42px;
+}
+
+.empty-state strong {
+  font-size: 15px;
+}
+
+.brand-mark {
+  width: 31px;
+  height: 31px;
+  border-radius: 9px;
+  box-shadow: 0 5px 12px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+.brand-mark svg,
+.nav-item svg,
+.icon-button svg,
+.primary-button svg,
+.secondary-button svg,
+.text-button svg,
+.focus-actions svg,
+.metric-icon svg,
+.empty-state > div svg,
+.project-symbol svg {
+  transition: transform .18s ease, stroke-width .18s ease;
+}
+
+.nav-item:hover svg,
+.icon-button:hover svg,
+.primary-button:hover svg,
+.secondary-button:hover svg,
+.text-button:hover svg,
+.focus-actions button:hover svg,
+.project-card:hover .project-symbol svg {
+  transform: translateY(-1px) scale(1.1);
+}
+
+.nav-item.selected svg {
+  stroke-width: 2.5;
+}
+
+.metric-icon {
+  width: 38px;
+  height: 38px;
+  flex-basis: 38px;
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.metric-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.3;
+}
+
+.daily-metrics .metric:nth-child(2) .metric-icon {
+  color: var(--success);
+  background: color-mix(in srgb, var(--success) 12%, var(--surface));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--success) 18%, transparent);
+}
+
+.daily-metrics .metric:nth-child(3) .metric-icon {
+  color: var(--warning);
+  background: color-mix(in srgb, var(--warning) 13%, var(--surface));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--warning) 18%, transparent);
+}
+
+.row-start {
+  transition: opacity .18s ease, transform .18s ease, background .18s ease;
+}
+
+.task-row:hover .row-start,
+.task-row.selected .row-start {
+  transform: scale(1.08);
+}
+
+.project-symbol {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  box-shadow: 0 5px 12px rgba(31, 42, 61, .12);
+}
+
+.project-symbol svg {
+  width: 20px;
+  height: 20px;
+}
+
+.empty-state > div {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  box-shadow: 0 6px 14px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.empty-state > div svg {
+  width: 25px;
+  height: 25px;
+  stroke-width: 2.2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-mark svg,
+  .nav-item svg,
+  .icon-button svg,
+  .primary-button svg,
+  .secondary-button svg,
+  .text-button svg,
+  .focus-actions svg,
+  .metric-icon svg,
+  .empty-state > div svg,
+  .project-symbol svg,
+  .row-start {
+    transition: none;
+  }
+}
