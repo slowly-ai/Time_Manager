@@ -731,3 +731,76 @@ body,
     transition: none;
   }
 }
+
+.settings-layout {
+  grid-template-columns: 200px minmax(0, 760px);
+  gap: 28px;
+  align-items: start;
+}
+
+.settings-menu {
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.settings-menu button {
+  min-height: 40px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+.settings-content {
+  min-width: 0;
+  gap: 0;
+  padding: 24px 28px 30px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.settings-section-preferences,
+.settings-section-data {
+  display: flex;
+  flex-direction: column;
+  gap: 37px;
+}
+
+.settings-content-appearance > .settings-section-preferences,
+.settings-content-appearance > .settings-section-data,
+.settings-content-preferences > .setting-section-appearance,
+.settings-content-preferences > .settings-section-data,
+.settings-content-data > .setting-section-appearance,
+.settings-content-data > .settings-section-preferences {
+  display: none;
+}
+
+.settings-content-data > .settings-section-data {
+  display: block;
+}
+
+.settings-content .setting-heading h2 {
+  font-size: 16px;
+}
+
+.settings-content .setting-heading span {
+  font-size: 12px;
+}
+
+.settings-content .setting-row {
+  min-height: 68px;
+}
+
+@media (max-width: 1120px) {
+  .settings-layout {
+    grid-template-columns: 170px minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .settings-content {
+    padding: 20px;
+  }
+}
