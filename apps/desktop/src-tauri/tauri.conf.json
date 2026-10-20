@@ -18,7 +18,9 @@
         "minWidth": 1024,
         "minHeight": 680,
         "resizable": true,
-        "decorations": true
+        "decorations": true,
+        "center": true,
+        "dragDropEnabled": false
       }
     ],
     "security": { "csp": "default-src 'self'; connect-src 'self' http://localhost:4000 https://*.tempo.app; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:" }
