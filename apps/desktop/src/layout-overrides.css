@@ -804,3 +804,443 @@ body,
     padding: 20px;
   }
 }
+
+/* Monochrome minimal design pass: calm contrast, moderate type, and clear whitespace. */
+:root {
+  --bg: #f7f7f7;
+  --surface: #ffffff;
+  --surface-soft: #f0f0f0;
+  --text: #171717;
+  --muted: #666666;
+  --weak: #999999;
+  --line: #dedede;
+  --accent: #171717;
+  --accent-soft: #ededed;
+  --success: #444444;
+  --warning: #707070;
+  --danger: #333333;
+  --shadow: none;
+}
+
+:root[data-theme='dark'] {
+  --bg: #151515;
+  --surface: #202020;
+  --surface-soft: #2a2a2a;
+  --text: #f5f5f5;
+  --muted: #b5b5b5;
+  --weak: #858585;
+  --line: #3b3b3b;
+  --accent: #f5f5f5;
+  --accent-soft: #303030;
+  --success: #d0d0d0;
+  --warning: #aaaaaa;
+  --danger: #f0f0f0;
+  --shadow: none;
+}
+
+body {
+  letter-spacing: 0;
+}
+
+.sidebar {
+  width: 230px;
+  flex-basis: 230px;
+  padding-top: 22px;
+  background: var(--surface);
+}
+
+.brand {
+  gap: 9px;
+  padding-bottom: 24px;
+}
+
+.brand strong {
+  font-size: 14px;
+}
+
+.brand span,
+.sidebar-empty,
+.sidebar-bottom small,
+.eyebrow {
+  font-size: 10px;
+}
+
+.brand-mark {
+  width: 30px;
+  height: 30px;
+}
+
+.nav-item {
+  min-height: 35px;
+  gap: 10px;
+  font-size: 13px;
+  border-radius: 6px;
+}
+
+.nav-item svg,
+.icon-button svg,
+.primary-button svg,
+.secondary-button svg,
+.text-button svg,
+.focus-actions svg,
+.metric-icon svg,
+.empty-state > div svg,
+.project-symbol svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.9;
+}
+
+.nav-item:hover,
+.nav-item.selected,
+.project-link:hover,
+.task-row:hover,
+.task-row.selected,
+.secondary-button:hover,
+.project-menu button:hover,
+.project-menu button:focus-visible {
+  background: var(--surface-soft);
+}
+
+.nav-item.selected,
+.text-button,
+.data-note,
+.progress-strip strong {
+  color: var(--text);
+}
+
+.topbar {
+  height: 62px;
+  padding: 0 32px;
+  background: var(--bg);
+}
+
+.breadcrumbs,
+.top-actions,
+.primary-button,
+.secondary-button,
+.pause-button,
+.finish-button,
+.wide-start,
+.danger-button,
+.text-button {
+  font-size: 12px;
+}
+
+.page {
+  padding: 26px 36px 48px;
+}
+
+.page h1 {
+  margin-top: 6px;
+  margin-bottom: 7px;
+  font-size: 28px;
+  letter-spacing: -.035em;
+}
+
+.page-heading p {
+  font-size: 13px;
+}
+
+.page-heading,
+.page-heading.compact {
+  margin-bottom: 22px;
+}
+
+.primary-button,
+.secondary-button,
+.pause-button,
+.finish-button,
+.wide-start,
+.danger-button {
+  min-height: 34px;
+  border-radius: 6px;
+  box-shadow: none;
+}
+
+.primary-button,
+.wide-start {
+  color: var(--bg);
+  background: var(--accent);
+}
+
+.primary-button:hover,
+.wide-start:hover {
+  color: var(--bg);
+  background: color-mix(in srgb, var(--accent) 86%, var(--surface));
+}
+
+.pause-button {
+  color: var(--bg);
+  background: var(--text);
+}
+
+.finish-button {
+  color: var(--text);
+  background: var(--surface-soft);
+}
+
+.secondary-button {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.daily-metrics,
+.history-summary,
+.stats-grid {
+  gap: 12px;
+}
+
+.metric,
+.history-summary > div,
+.stat-card,
+.task-list,
+.task-list-panel,
+.detail-panel,
+.focus-panel,
+.progress-strip,
+.chart-panel,
+.project-card,
+.history-table,
+.settings-menu,
+.settings-content {
+  box-shadow: none;
+  border-radius: 7px;
+}
+
+.metric {
+  min-height: 76px;
+  padding: 14px;
+}
+
+.metric-icon {
+  width: 32px;
+  height: 32px;
+  flex-basis: 32px;
+  color: var(--text);
+  background: var(--surface-soft);
+  border-radius: 7px;
+  box-shadow: none;
+}
+
+.metric-icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+.daily-metrics .metric:nth-child(2) .metric-icon,
+.daily-metrics .metric:nth-child(3) .metric-icon {
+  color: var(--text);
+  background: var(--surface-soft);
+  box-shadow: none;
+}
+
+.metric span,
+.section-heading span,
+.focus-context,
+.task-main span,
+.detail-title span,
+.detail-panel p,
+.history-summary span,
+.stat-card span,
+.data-note,
+.setting-heading span,
+.setting-row span,
+.distribution-row,
+.history-row,
+.project-card > span:not(.project-card-top) {
+  font-size: 11px;
+}
+
+.metric strong {
+  font-size: 21px;
+}
+
+.section-heading h2 {
+  font-size: 16px;
+}
+
+.task-main strong {
+  font-size: 13px;
+}
+
+.focus-panel h2 {
+  font-size: 18px;
+}
+
+.big-timer {
+  font-size: 38px;
+}
+
+.row-start {
+  color: var(--text);
+  background: var(--surface-soft);
+}
+
+.check-box.checked {
+  color: var(--bg);
+  background: var(--text);
+  border-color: var(--text);
+}
+
+.priority.high,
+.priority.medium,
+.priority.low {
+  color: var(--muted);
+  background: var(--surface-soft);
+}
+
+.project-card {
+  min-height: 164px;
+  padding: 16px;
+}
+
+.project-symbol {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  box-shadow: none;
+  color: var(--surface) !important;
+  background: var(--text) !important;
+}
+
+.project-link i,
+.project-dot,
+.task-main i,
+.detail-title > i {
+  background: var(--text) !important;
+}
+
+.session-dot,
+.session-dot.paused,
+.session-dot.cancelled {
+  background: var(--text);
+}
+
+.color-picker button {
+  filter: grayscale(1);
+}
+
+.project-progress,
+.progress-track {
+  background: var(--surface-soft);
+}
+
+.project-progress i,
+.progress-track i,
+.bar-track i {
+  background: var(--text) !important;
+}
+
+.settings-layout {
+  grid-template-columns: 190px minmax(0, 720px);
+  gap: 24px;
+}
+
+.settings-menu {
+  padding: 4px;
+}
+
+.settings-menu button {
+  min-height: 38px;
+  font-size: 12px;
+}
+
+.settings-menu button.active {
+  color: var(--text);
+  background: var(--surface-soft);
+}
+
+.settings-content {
+  padding: 22px 24px 26px;
+}
+
+.settings-content .setting-heading h2 {
+  font-size: 15px;
+}
+
+.settings-content .setting-row {
+  min-height: 60px;
+}
+
+.settings-content .setting-row strong {
+  font-size: 12px;
+}
+
+.segmented,
+.timer-tabs {
+  background: var(--surface-soft);
+}
+
+.segmented button.active,
+.timer-tabs button.active,
+.choice-row button.active {
+  color: var(--text);
+  background: var(--surface);
+  border-color: var(--line);
+  box-shadow: none;
+}
+
+.toggle {
+  background: var(--line);
+}
+
+.toggle.on {
+  background: var(--text);
+}
+
+.toggle.on span {
+  background: var(--bg);
+}
+
+.empty-state > div {
+  width: 40px;
+  height: 40px;
+  color: var(--text);
+  background: var(--surface-soft);
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.empty-state strong {
+  font-size: 13px;
+}
+
+.empty-state span {
+  font-size: 11px;
+}
+
+.modal-backdrop {
+  background: rgba(0, 0, 0, .24);
+  backdrop-filter: blur(2px);
+}
+
+.modal {
+  box-shadow: 0 18px 40px rgba(0, 0, 0, .14);
+}
+
+.toast {
+  color: var(--bg);
+  background: var(--text);
+  box-shadow: none;
+}
+
+.data-status i {
+  background: var(--text);
+}
+
+@media (max-width: 1120px) {
+  .sidebar {
+    width: 214px;
+    flex-basis: 214px;
+  }
+
+  .page {
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+
+  .topbar {
+    padding: 0 28px;
+  }
+}

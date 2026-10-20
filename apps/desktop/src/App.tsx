@@ -4,7 +4,7 @@ import { createId, formatDuration, isFocusSession, loadState, saveState, session
 
 type View = 'today' | 'tasks' | 'projects' | 'history' | 'stats' | 'settings'
 type SettingsSection = 'preferences' | 'appearance' | 'data'
-const colors = ['#536dfe', '#23866a', '#c48a35', '#b06bc3', '#d95454']
+const colors = ['#171717', '#4a4a4a', '#707070', '#969696', '#bdbdbd']
 const priorityNames: Record<Priority, string> = { high: '高', medium: '中', low: '低' }
 
 export default function App() {
