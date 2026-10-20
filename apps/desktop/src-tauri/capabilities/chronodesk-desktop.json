@@ -1,0 +1,15 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "chronodesk-desktop",
+  "description": "Permissions required by the main window and floating timer widget.",
+  "windows": ["main", "timer-widget"],
+  "permissions": [
+    "core:default",
+    "core:webview:allow-create-webview-window",
+    "core:window:allow-current-monitor",
+    "core:window:allow-close",
+    "core:window:allow-show",
+    "core:window:allow-set-always-on-top",
+    "core:window:allow-start-dragging"
+  ]
+}
