@@ -870,6 +870,10 @@ body {
   height: 30px;
 }
 
+:root[data-theme='dark'] .brand-logo {
+  filter: invert(1);
+}
+
 .nav-item {
   min-height: 35px;
   gap: 10px;
