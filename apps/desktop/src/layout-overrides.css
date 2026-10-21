@@ -1105,14 +1105,6 @@ body {
   border-radius: 8px;
   box-shadow: none;
   color: var(--surface) !important;
-  background: var(--text) !important;
-}
-
-.project-link i,
-.project-dot,
-.task-main i,
-.detail-title > i {
-  background: var(--text) !important;
 }
 
 .session-dot,
@@ -1122,7 +1114,7 @@ body {
 }
 
 .color-picker button {
-  filter: grayscale(1);
+  border: 2px solid rgba(20, 35, 55, .12);
 }
 
 .project-progress,
@@ -1130,10 +1122,12 @@ body {
   background: var(--surface-soft);
 }
 
-.project-progress i,
-.progress-track i,
+.progress-track i {
+  background: var(--text);
+}
+
 .bar-track i {
-  background: var(--text) !important;
+  background: var(--text);
 }
 
 .settings-layout {
@@ -1461,6 +1455,8 @@ body.timer-widget-body {
 
 /* Task readability and editing controls */
 .check-box {
+  display: grid;
+  flex-shrink: 0;
   width: 22px;
   height: 22px;
   flex-basis: 22px;
@@ -1472,12 +1468,24 @@ body.timer-widget-body {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 6px;
-  height: 11px;
-  border-right: 2px solid #fff;
-  border-bottom: 2px solid #fff;
-  transform: translate(-50%, -58%) rotate(45deg);
-  transform-origin: center;
+  display: grid;
+  width: 14px;
+  height: 14px;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  line-height: 0;
+}
+.check-mark svg {
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+.check-mark path {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .task-main strong { font-size: 16px; }
 .task-main span { font-size: 13px; }
