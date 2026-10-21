@@ -1457,3 +1457,56 @@ body.timer-widget-body {
     transition: none;
   }
 }
+
+/* Task readability and editing controls */
+.check-box {
+  width: 22px;
+  height: 22px;
+  flex-basis: 22px;
+  line-height: 0;
+  place-items: center;
+}
+.check-box svg { display: block; }
+.check-box.checked { background: #171717; border-color: #171717; }
+.task-main strong { font-size: 16px; }
+.task-main span { font-size: 13px; }
+.task-time { font-size: 12px; }
+.priority { font-size: 11px; }
+.page h1 { font-size: 36px; }
+.section-heading h2 { font-size: 20px; }
+.history-head { min-height: 48px; font-size: 13px; }
+.history-row { min-height: 68px; font-size: 14px; }
+.history-row strong { font-size: 15px; }
+.history-summary span { font-size: 13px; }
+.history-summary strong { font-size: 24px; }
+.nav-item { font-size: 14px; }
+.task-detail-options { display: flex; flex-direction: column; gap: 14px; margin: 0 0 18px; }
+.task-detail-options > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.task-detail-options strong { font-size: 13px; }
+.priority-picker { display: flex; gap: 4px; }
+.priority-picker button { min-width: 35px; padding: 5px 8px; color: var(--muted); background: var(--surface-soft); border: 1px solid var(--line); border-radius: 5px; font-size: 12px; }
+.priority-picker button.active { color: var(--text); background: var(--surface); border-color: var(--text); }
+.recurrence-toggle { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+.recurrence-toggle input { width: 16px; height: 16px; accent-color: #171717; }
+.form-recurring { margin-top: 2px; }
+.duplicate-task-message { display: flex; flex-direction: column; gap: 8px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.duplicate-task-message strong { color: var(--text); font-size: 16px; }
+.duplicate-actions { display: flex; flex-direction: column; gap: 9px; margin-top: 22px; }
+.duplicate-actions .text-button { justify-content: center; min-height: 34px; color: var(--muted); font-size: 12px; }
+
+/* Compact timer widget: keep the information hierarchy while reducing obstruction. */
+.timer-widget-root { padding: 12px 13px 11px; border-radius: 10px; }
+.timer-widget-drag { min-height: 16px; font-size: 11px; }
+.timer-widget-drag svg { width: 14px; height: 14px; }
+.timer-widget-root > strong { margin-top: 5px; font-size: 14px; }
+.timer-widget-footer { margin-top: 7px; }
+.timer-widget-footer time { font-size: 22px; }
+.timer-widget-actions { gap: 5px; }
+.timer-widget-actions button { width: 29px; height: 29px; border-radius: 7px; }
+.timer-widget-actions button svg { width: 14px; height: 14px; }
+
+@media (max-width: 900px) {
+  .page h1 { font-size: 31px; }
+  .history-head, .history-row { grid-template-columns: 1.5fr 1fr 1.3fr .8fr .8fr; gap: 8px; }
+  .history-row { font-size: 13px; }
+}

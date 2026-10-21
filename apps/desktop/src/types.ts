@@ -1,4 +1,5 @@
 export type TaskStatus = 'todo' | 'running' | 'done'
+export type TaskRecurrence = 'none' | 'daily'
 export type Priority = 'low' | 'medium' | 'high'
 export type TimerMode = 'stopwatch' | 'pomodoro'
 export type PomodoroPhase = 'focus' | 'short_break' | 'long_break'
@@ -18,6 +19,7 @@ export interface Task {
   description: string
   projectId: string
   priority: Priority
+  recurrence: TaskRecurrence
   status: TaskStatus
   plannedMs: number
   dueDate?: string
@@ -73,7 +75,15 @@ export function loadState(): ChronoState {
   try {
     const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null')
     if (!parsed) return defaultState
-    return { ...defaultState, ...parsed, settings: { ...defaultSettings, ...parsed.settings } }
+    const hydrated: ChronoState = {
+      ...defaultState,
+      ...parsed,
+      tasks: Array.isArray(parsed.tasks) ? parsed.tasks.map((task: Partial<Task>) => ({ recurrence: 'none' as TaskRecurrence, ...task })) : [],
+      sessions: Array.isArray(parsed.sessions) ? parsed.sessions : [],
+      projects: Array.isArray(parsed.projects) ? parsed.projects : [],
+      settings: { ...defaultSettings, ...parsed.settings },
+    }
+    return rolloverRecurringTasks(mergeDuplicateTasks(hydrated))
   } catch { return defaultState }
 }
 
@@ -96,3 +106,67 @@ export function formatDuration(ms: number, includeHours = true) {
 }
 
 export function isFocusSession(session: FocusSession) { return session.phase === 'focus' }
+
+export function normalizeTaskKey(task: Pick<Task, 'projectId' | 'title'>) {
+  return `${task.projectId.trim()}::${task.title.trim().toLocaleLowerCase()}`
+}
+
+function taskTimestamp(value: string | undefined) {
+  const parsed = value ? Date.parse(value) : Number.NaN
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
+/** Merge duplicate task shells while keeping every historical session. */
+export function mergeDuplicateTasks(state: ChronoState): ChronoState {
+  const groups = new Map<string, Task[]>()
+  for (const task of state.tasks) {
+    const key = normalizeTaskKey(task)
+    const group = groups.get(key) ?? []
+    group.push(task)
+    groups.set(key, group)
+  }
+  if (![...groups.values()].some((group) => group.length > 1)) return state
+
+  const taskIdMap = new Map<string, string>()
+  const merged: Task[] = []
+  for (const group of groups.values()) {
+    group.sort((a, b) => taskTimestamp(a.createdAt) - taskTimestamp(b.createdAt) || a.sortOrder - b.sortOrder)
+    const primary = group[0]
+    const latest = [...group].sort((a, b) => taskTimestamp(b.updatedAt) - taskTimestamp(a.updatedAt))[0]
+    const mergedTask: Task = {
+      ...primary,
+      title: latest.title.trim() || primary.title,
+      description: latest.description || primary.description,
+      priority: latest.priority,
+      plannedMs: latest.plannedMs,
+      recurrence: group.some((task) => task.recurrence === 'daily') ? 'daily' : latest.recurrence,
+      status: group.some((task) => task.status === 'running') ? 'running' : latest.status,
+      completedAt: latest.completedAt,
+      updatedAt: latest.updatedAt,
+    }
+    merged.push(mergedTask)
+    group.forEach((task) => taskIdMap.set(task.id, primary.id))
+  }
+  return {
+    ...state,
+    tasks: merged.sort((a, b) => a.sortOrder - b.sortOrder),
+    sessions: state.sessions.map((session) => {
+      const taskId = taskIdMap.get(session.taskId) ?? session.taskId
+      return taskId === session.taskId ? session : { ...session, taskId }
+    }),
+  }
+}
+
+export function rolloverRecurringTasks(state: ChronoState, now = Date.now()): ChronoState {
+  const today = new Date(now)
+  today.setHours(0, 0, 0, 0)
+  const todayStart = today.getTime()
+  let changed = false
+  const tasks = state.tasks.map((task) => {
+    if (task.recurrence !== 'daily' || task.status !== 'done' || !task.completedAt) return task
+    if (taskTimestamp(task.completedAt) >= todayStart) return task
+    changed = true
+    return { ...task, status: 'todo' as const, completedAt: undefined, updatedAt: new Date(now).toISOString() }
+  })
+  return changed ? { ...state, tasks } : state
+}
