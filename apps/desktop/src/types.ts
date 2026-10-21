@@ -27,6 +27,8 @@ export interface Task {
   createdAt: string
   updatedAt: string
   completedAt?: string
+  todayAddedOn?: string
+  todayDismissedOn?: string
 }
 
 export interface FocusSession {
@@ -106,6 +108,31 @@ export function formatDuration(ms: number, includeHours = true) {
 }
 
 export function isFocusSession(session: FocusSession) { return session.phase === 'focus' }
+
+export const MIN_RECORDABLE_SESSION_MS = 60 * 1000
+
+export function todayKey(now = Date.now()) {
+  const date = new Date(now)
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+}
+
+export function isTaskVisibleToday(task: Pick<Task, 'recurrence' | 'todayAddedOn' | 'todayDismissedOn'>, day = todayKey()) {
+  if (task.todayDismissedOn === day) return false
+  if (task.recurrence === 'daily') return task.todayAddedOn === day
+  return !task.todayAddedOn || task.todayAddedOn === day
+}
+
+export function addTaskToToday(task: Task, day = todayKey()): Task {
+  return { ...task, todayAddedOn: day, todayDismissedOn: undefined, status: 'todo', completedAt: undefined }
+}
+
+export function dismissTaskForToday(task: Task, day = todayKey()): Task {
+  return { ...task, todayDismissedOn: day, status: 'todo', completedAt: undefined }
+}
+
+export function isRecordableSession(session: FocusSession, now = Date.now()) {
+  return sessionElapsed(session, now) >= MIN_RECORDABLE_SESSION_MS
+}
 
 export function normalizeTaskKey(task: Pick<Task, 'projectId' | 'title'>) {
   return `${task.projectId.trim()}::${task.title.trim().toLocaleLowerCase()}`
