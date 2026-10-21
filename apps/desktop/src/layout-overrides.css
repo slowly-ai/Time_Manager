@@ -29,6 +29,7 @@ body,
   min-height: 0;
   padding: 22px 38px 14px;
   overflow-y: auto;
+  overscroll-behavior: contain;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -1823,4 +1824,178 @@ textarea {
   .task-row { gap: 9px; padding-inline: 11px; }
   .task-time { width: 76px; font-size: 12px; }
   .settings-menu button { font-size: 12px; }
+}
+
+/* Fixed viewport shell and page-local scrolling */
+:root {
+  --muted: #555555;
+  --weak: #707070;
+}
+
+:root[data-theme='dark'] {
+  --muted: #c0c0c0;
+  --weak: #a6a6a6;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+body {
+  min-width: 1024px;
+  min-height: 0;
+}
+
+.app-shell {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sidebar {
+  height: 100%;
+  min-height: 0;
+  flex-shrink: 0;
+}
+
+.main-content {
+  width: 0;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.topbar {
+  height: 72px;
+  min-height: 72px;
+  flex: 0 0 72px;
+}
+
+.page {
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #a0a0a0 transparent;
+}
+
+.page::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.page::-webkit-scrollbar-thumb {
+  background: #a0a0a0;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background-clip: padding-box;
+}
+
+.page::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.today-page {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  min-height: 0;
+  height: auto;
+  flex: 1 1 auto;
+  overflow: hidden;
+  padding-bottom: 20px;
+}
+
+.today-page .today-layout {
+  min-height: 0;
+  grid-template-columns: minmax(0, 1fr) 355px;
+  align-items: start;
+  margin-bottom: 18px;
+}
+
+.today-page .today-layout > section {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.today-page .today-layout > section > .section-heading {
+  flex: 0 0 auto;
+}
+
+.today-page .task-list {
+  min-width: 0;
+  min-height: 0;
+  max-height: min(48vh, 520px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #a0a0a0 transparent;
+}
+
+.today-page .task-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.today-page .task-list::-webkit-scrollbar-thumb {
+  background: #a0a0a0;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background-clip: padding-box;
+}
+
+.today-page .task-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.today-page .focus-panel {
+  min-width: 0;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.progress-strip {
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
+@media (max-height: 760px) {
+  .page { padding-top: 20px; padding-bottom: 18px; }
+  .today-page { padding-bottom: 12px; }
+  .today-page .page-heading { margin-bottom: 16px; }
+  .today-page h1 { margin-top: 5px; margin-bottom: 4px; font-size: 34px; }
+  .today-page .page-heading p { font-size: 14px; }
+  .today-page .daily-metrics { margin-bottom: 16px; }
+  .today-page .metric { min-height: 84px; padding: 13px 16px; }
+  .today-page .today-layout { gap: 18px; margin-bottom: 12px; }
+  .today-page .focus-panel { padding: 14px 17px; }
+  .today-page .focus-panel .section-heading { margin-bottom: 2px; }
+  .today-page .focus-panel h2 { margin-top: 3px; font-size: 19px; }
+  .today-page .timer-tabs { margin-top: 9px; }
+  .today-page .big-timer { padding: 10px 0; font-size: 36px; }
+  .today-page .focus-hint { margin-top: 7px; }
+  .today-page .progress-strip { padding: 13px 17px; }
+  .today-page .progress-strip .section-heading { margin-bottom: 7px; }
+  .today-page .progress-track { height: 6px; }
+  .today-page .task-list { max-height: min(46vh, 360px); }
+}
+
+@media (max-width: 1120px) {
+  .today-page .today-layout { grid-template-columns: minmax(0, 1fr) 330px; }
+}
+
+@media (max-width: 760px) {
+  .today-page .today-layout { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; overflow: hidden; }
+  .today-page .focus-panel { max-height: none; }
 }
