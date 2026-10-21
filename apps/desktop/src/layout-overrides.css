@@ -1884,16 +1884,102 @@ body {
   min-height: 0;
   flex: 1 1 auto;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: hidden;
+}
+
+.content-page {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.content-page > :last-child {
+  min-height: 0;
+}
+
+.content-page .page-heading {
+  min-width: 0;
+}
+
+.content-page .content-columns,
+.content-page .project-grid,
+.content-page .settings-layout {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
   scrollbar-width: thin;
   scrollbar-color: #a0a0a0 transparent;
 }
 
-.page::-webkit-scrollbar {
+.page:has(> .project-grid) {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.page:has(> .project-grid) > .project-grid,
+.page:has(> .project-grid) > .empty-state {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #a0a0a0 transparent;
+}
+
+.page:has(> .history-summary) {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+
+.page:has(> .history-summary) > .history-table {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #a0a0a0 transparent;
+}
+
+.page:has(> .stats-grid) {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+
+.page:has(> .stats-grid) > .analytics-grid {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.page:has(> .settings-layout) {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.page:has(> .settings-layout) > .settings-layout {
+  min-height: 0;
+  height: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #a0a0a0 transparent;
+}
+
+.content-page .content-columns::-webkit-scrollbar,
+.content-page .project-grid::-webkit-scrollbar,
+.content-page .settings-layout::-webkit-scrollbar,
+.history-page .history-table::-webkit-scrollbar,
+.stats-page .analytics-grid::-webkit-scrollbar,
+.tasks-page .task-list-panel::-webkit-scrollbar,
+.tasks-page .detail-panel::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
+.content-page .content-columns::-webkit-scrollbar-thumb,
+.content-page .project-grid::-webkit-scrollbar-thumb,
+.content-page .settings-layout::-webkit-scrollbar-thumb,
+.history-page .history-table::-webkit-scrollbar-thumb,
+.stats-page .analytics-grid::-webkit-scrollbar-thumb,
+.tasks-page .task-list-panel::-webkit-scrollbar-thumb,
+.tasks-page .detail-panel::-webkit-scrollbar-thumb,
 .page::-webkit-scrollbar-thumb {
   background: #a0a0a0;
   border: 2px solid transparent;
@@ -1901,8 +1987,84 @@ body {
   background-clip: padding-box;
 }
 
-.page::-webkit-scrollbar-track {
+.content-page .content-columns::-webkit-scrollbar-track,
+.content-page .project-grid::-webkit-scrollbar-track,
+.content-page .settings-layout::-webkit-scrollbar-track,
+.history-page .history-table::-webkit-scrollbar-track,
+.stats-page .analytics-grid::-webkit-scrollbar-track,
+.tasks-page .task-list-panel::-webkit-scrollbar-track,
+.tasks-page .detail-panel::-webkit-scrollbar-track {
   background: transparent;
+}
+
+.page:has(> .project-grid) > .project-grid::-webkit-scrollbar,
+.page:has(> .project-grid) > .empty-state::-webkit-scrollbar,
+.page:has(> .history-summary) > .history-table::-webkit-scrollbar,
+.page:has(> .stats-grid) > .analytics-grid::-webkit-scrollbar,
+.page:has(> .settings-layout) > .settings-layout::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.page:has(> .project-grid) > .project-grid::-webkit-scrollbar-thumb,
+.page:has(> .project-grid) > .empty-state::-webkit-scrollbar-thumb,
+.page:has(> .history-summary) > .history-table::-webkit-scrollbar-thumb,
+.page:has(> .stats-grid) > .analytics-grid::-webkit-scrollbar-thumb,
+.page:has(> .settings-layout) > .settings-layout::-webkit-scrollbar-thumb {
+  background: #a0a0a0;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background-clip: padding-box;
+}
+
+.tasks-page .content-columns {
+  display: grid;
+  height: 100%;
+  min-height: 0;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  overflow: hidden;
+}
+
+.tasks-page .task-list-panel,
+.tasks-page .detail-panel {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #a0a0a0 transparent;
+}
+
+.projects-page .project-grid {
+  align-content: start;
+}
+
+.history-page {
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+
+.history-page .history-table {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #a0a0a0 transparent;
+}
+
+.stats-page {
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+
+.stats-page .analytics-grid {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.settings-page .settings-layout {
+  height: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
 }
 
 .today-page {
@@ -1918,8 +2080,8 @@ body {
 .today-page .today-layout {
   min-height: 0;
   grid-template-columns: minmax(0, 1fr) 355px;
-  align-items: start;
-  margin-bottom: 18px;
+  align-items: stretch;
+  margin-bottom: 24px;
 }
 
 .today-page .today-layout > section {
@@ -1936,12 +2098,21 @@ body {
 .today-page .task-list {
   min-width: 0;
   min-height: 0;
+  flex: 0 1 auto;
   max-height: min(48vh, 520px);
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
   scrollbar-color: #a0a0a0 transparent;
+}
+
+.today-page .today-layout > section:first-child > .empty-state {
+  flex: 1 1 auto;
+  justify-content: center;
+  min-height: 0;
+  margin-bottom: 0;
+  padding: 24px 20px;
 }
 
 .today-page .task-list::-webkit-scrollbar {
@@ -1998,4 +2169,6 @@ body {
 @media (max-width: 760px) {
   .today-page .today-layout { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; overflow: hidden; }
   .today-page .focus-panel { max-height: none; }
+  .tasks-page .content-columns { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
+  .tasks-page .detail-panel { max-height: 45%; }
 }
