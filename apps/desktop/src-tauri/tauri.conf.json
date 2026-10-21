@@ -30,6 +30,10 @@
     "targets": ["msi", "nsis"],
     "windows": {
       "webviewInstallMode": { "type": "offlineInstaller" }
-    }
+    },
+    "icon": [
+      "icons/icon.ico",
+      "icons/icon.png"
+    ]
   }
 }

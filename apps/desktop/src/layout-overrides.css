@@ -2401,3 +2401,29 @@ body {
   margin-top: 2px;
   font-size: 13px;
 }
+.focus-empty-state {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px;
+  text-align: center;
+}
+.focus-empty-state > div { display: grid; width: 46px; height: 46px; place-items: center; color: var(--text); background: var(--surface-soft); border-radius: 14px; }
+.focus-empty-state strong { color: var(--text); font-size: 17px; }
+.focus-empty-state span { color: var(--muted); font-size: 14px; line-height: 1.45; }
+.bulk-actions { display: flex; align-items: center; gap: 8px; }
+.bulk-actions .danger-button { margin: 0; }
+.bulk-actions .danger-button:disabled { cursor: not-allowed; opacity: .45; }
+.bulk-select-row { cursor: pointer; }
+.page:has(> .project-grid) > .project-grid { align-content: start; grid-auto-rows: max-content; }
+.project-grid > .project-card { align-self: start; min-height: 190px; height: fit-content; }
+.task-description { display: block; width: 100%; margin: 18px 0; padding: 10px 12px; color: var(--muted); background: transparent; border: 1px solid transparent; border-radius: 10px; font: inherit; font-size: 14px; line-height: 1.55; text-align: left; white-space: pre-wrap; }
+.task-description:hover, .task-description:focus-visible { border-color: var(--line); background: var(--surface-soft); outline: none; }
+.task-description.empty-description { color: var(--weak); }
+.task-description-editor { margin: 18px 0; }
+.task-description-editor textarea { width: 100%; min-height: 90px; padding: 10px 12px; resize: vertical; color: var(--text); background: var(--surface-soft); border: 1px solid var(--line); border-radius: 10px; font: inherit; font-size: 14px; line-height: 1.5; }
+.task-description-editor > div { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
