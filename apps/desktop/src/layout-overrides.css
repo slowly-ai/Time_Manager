@@ -1297,6 +1297,7 @@ body {
 }
 
 .check-box {
+  position: relative;
   width: 22px;
   height: 22px;
   flex-basis: 22px;
@@ -1466,8 +1467,18 @@ body.timer-widget-body {
   line-height: 0;
   place-items: center;
 }
-.check-box svg { display: block; }
 .check-box.checked { background: #171717; border-color: #171717; }
+.check-mark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 11px;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: translate(-50%, -58%) rotate(45deg);
+  transform-origin: center;
+}
 .task-main strong { font-size: 16px; }
 .task-main span { font-size: 13px; }
 .task-time { font-size: 12px; }
