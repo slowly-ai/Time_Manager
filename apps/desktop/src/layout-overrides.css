@@ -2141,6 +2141,99 @@ body {
   flex: 0 0 auto;
 }
 
+/* Keep the today task list roomy while the rest of the workspace stays fixed. */
+.today-page .daily-metrics {
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.today-page .metric {
+  min-height: 94px;
+  padding: 15px 18px;
+}
+
+.today-page .task-list {
+  flex: 1 1 0;
+  max-height: none;
+}
+
+.detail-kicker {
+  margin-bottom: 20px;
+  color: var(--muted);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.task-description {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  margin: 18px 0;
+  padding: 10px 0;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.65;
+  text-align: left;
+  white-space: pre-wrap;
+  cursor: text;
+}
+
+.task-description.empty-description {
+  padding: 12px 14px;
+  color: var(--muted);
+  background: var(--surface-soft);
+  border: 1px dashed var(--line-strong, var(--line));
+  border-radius: 12px;
+}
+
+.task-description:hover {
+  background: var(--surface-soft);
+  border-radius: 10px;
+}
+
+.task-description-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.task-description-editor textarea {
+  width: 100%;
+  min-height: 92px;
+  padding: 12px 14px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.task-description-editor textarea:focus {
+  outline: 2px solid color-mix(in srgb, var(--text) 16%, transparent);
+  outline-offset: 1px;
+}
+
+.task-description-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@media (max-height: 760px) {
+  .today-page .daily-metrics { margin-bottom: 12px; }
+  .today-page .metric { min-height: 78px; padding: 11px 15px; }
+  .today-page .task-list { max-height: none; }
+}
+
 @media (max-height: 760px) {
   .page { padding-top: 20px; padding-bottom: 18px; }
   .today-page { padding-bottom: 12px; }
