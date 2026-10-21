@@ -2310,3 +2310,94 @@ body {
   .tasks-page .content-columns { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
   .tasks-page .detail-panel { max-height: 45%; }
 }
+
+/* The focus card is a compact dashboard tile: fit its controls inside it. */
+.today-page .focus-panel {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  padding: 15px 18px;
+  overflow: hidden;
+}
+
+.today-page .focus-panel .section-heading {
+  flex: 0 0 auto;
+  margin-bottom: 4px;
+}
+
+.today-page .focus-panel h2 {
+  margin-top: 3px;
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.today-page .focus-context {
+  flex: 0 0 auto;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.today-page .timer-tabs {
+  flex: 0 0 auto;
+  margin-top: 10px;
+}
+
+.today-page .timer-tabs button {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  font-size: 13px;
+}
+
+.today-page .big-timer {
+  flex: 0 0 auto;
+  padding: 10px 0;
+  font-size: 40px;
+  line-height: 1;
+}
+
+.today-page .focus-actions {
+  flex: 0 0 auto;
+  gap: 7px;
+}
+
+.today-page .focus-actions button {
+  min-height: 38px;
+  padding: 0 9px;
+  font-size: 13px;
+}
+
+.today-page .focus-hint {
+  flex: 0 0 auto;
+  margin-top: 8px;
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.today-page .focus-panel > .empty-state {
+  flex: 1 1 auto;
+  min-height: 0;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 8px;
+}
+
+.today-page .focus-panel > .empty-state > div {
+  width: 44px;
+  height: 44px;
+}
+
+.today-page .focus-panel > .empty-state strong {
+  font-size: 16px;
+}
+
+.today-page .focus-panel > .empty-state span {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.today-page .focus-panel > .empty-state .secondary-button {
+  flex: 0 0 auto;
+  min-height: 36px;
+  margin-top: 2px;
+  font-size: 13px;
+}
