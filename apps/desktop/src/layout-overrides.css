@@ -2234,6 +2234,51 @@ body {
   .today-page .task-list { max-height: none; }
 }
 
+/* Keep the task rows compact enough to expose a fourth item and let the
+   focus panel scroll internally instead of clipping its lower controls. */
+.today-page .today-layout {
+  min-height: 0;
+  align-items: stretch;
+}
+
+.today-page .today-layout > section:first-child > .section-heading {
+  margin-bottom: 9px;
+}
+
+.today-page .task-list .task-row {
+  min-height: 58px;
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+.today-page .focus-panel {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.today-page .focus-panel::-webkit-scrollbar {
+  width: 7px;
+}
+
+.today-page .focus-panel::-webkit-scrollbar-thumb {
+  background: #a0a0a0;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background-clip: padding-box;
+}
+
+@media (max-height: 860px) {
+  .today-page .page-heading { margin-bottom: 15px; }
+  .today-page .daily-metrics { margin-bottom: 12px; }
+  .today-page .today-layout { margin-bottom: 16px; }
+  .today-page .task-list .task-row { min-height: 54px; padding-top: 6px; padding-bottom: 6px; }
+  .today-page .focus-panel { padding: 17px 19px; }
+  .today-page .focus-panel .empty-state { padding: 28px 16px; }
+}
+
 @media (max-height: 760px) {
   .page { padding-top: 20px; padding-bottom: 18px; }
   .today-page { padding-bottom: 12px; }
