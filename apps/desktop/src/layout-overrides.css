@@ -1244,6 +1244,47 @@ body {
   padding: 4px;
 }
 
+/* Keep controls compact and make the active timer's content use its panel area. */
+.select-field select {
+  min-width: 136px;
+  min-height: 38px;
+  padding: 7px 30px 7px 11px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--text);
+  background: var(--surface);
+  font: inherit;
+}
+.switch-control { display: inline-flex; align-items: center; gap: 9px; color: var(--muted); font-size: 13px; }
+.switch-control input { width: 17px; height: 17px; accent-color: var(--text); }
+.focus-panel.active { display: flex; min-height: 0; flex-direction: column; }
+.focus-panel.active > .section-heading { flex: 0 0 auto; }
+.focus-active-content { display: flex; min-height: 0; flex: 1 1 auto; flex-direction: column; gap: 13px; }
+.focus-active-center { display: flex; flex: 1 1 auto; min-height: 140px; flex-direction: column; justify-content: center; align-items: center; gap: 20px; }
+.focus-active-center .big-timer { font-size: clamp(34px, 4vw, 52px); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.focus-actions { display: flex; width: min(100%, 380px); align-items: center; gap: 12px; }
+.focus-actions > button { flex: 1 1 0; }
+.focus-hint { margin-top: auto; color: var(--muted); text-align: center; font-size: 12px; }
+.focus-duration-summary { color: var(--muted); font-size: 12px; }
+.timer-mode-select { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 13px; }
+.chart-controls { display: flex; align-items: center; gap: 8px; }
+.chart-controls .segmented button { min-height: 32px; padding: 5px 10px; font-size: 12px; }
+.period-arrow { width: 32px; min-width: 32px; height: 32px; min-height: 32px; justify-content: center; padding: 0; }
+.period-title { min-width: 88px; text-align: center; font-size: 13px; }
+.stats-chart-heading { align-items: flex-start; gap: 16px; }
+.stats-page .bar-chart { gap: 5px; }
+.stats-page .bar-column { min-width: 0; flex: 1 1 0; }
+.stats-page .bar-column > span { overflow: hidden; width: 100%; text-overflow: ellipsis; white-space: nowrap; font-size: 9px; }
+.stats-page .bar-column small { font-size: 10px; }
+.stats-page .bar-track { background: #fff; border: 1px solid var(--line); }
+.stats-page .bar-track i { background: #171717; }
+.confirm-danger { justify-content: center; }
+
+@media (max-width: 1180px) {
+  .stats-chart-heading { flex-direction: column; }
+  .chart-controls { max-width: 100%; flex-wrap: wrap; }
+}
+
 .settings-menu button {
   min-height: 38px;
   font-size: 12px;
@@ -1344,7 +1385,10 @@ body {
 .history-toolbar { display: flex; align-items: center; justify-content: space-between; min-height: 48px; padding: 0 18px; border-bottom: 1px solid var(--line); color: var(--muted); }
 .history-toolbar > div { display: flex; align-items: center; gap: 10px; }
 .history-toolbar .danger-button:disabled { opacity: .45; cursor: not-allowed; }
-.history-head, .history-row.history-selectable { grid-template-columns: 28px 1.6fr 1fr 1.4fr .8fr .7fr; }
+.history-head, .history-row.history-selectable { grid-template-columns: 1.6fr 1fr 1.4fr .8fr .7fr; }
+.history-table.selection-mode .history-head,
+.history-table.selection-mode .history-row.history-selectable { grid-template-columns: 28px 1.6fr 1fr 1.4fr .8fr .7fr; }
+.history-table:not(.selection-mode) .history-check-column { display: none; }
 .history-selectable > input { justify-self: start; }
 .mini-history { margin-top: 12px; }
 .mini-history-toggle { display: flex; width: 100%; align-items: center; justify-content: space-between; padding: 10px 0; color: var(--text); background: transparent; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 14px; font-weight: 650; }
@@ -1352,7 +1396,7 @@ body {
 .mini-history-toggle svg { color: var(--muted); transition: transform .15s ease; }
 .mini-history-toggle svg.expanded { transform: rotate(180deg); }
 .mini-history-empty { display: block; padding: 12px 0; color: var(--muted); font-size: 12px; }
-.detail-delete-button { margin: 14px 0 2px; }
+.detail-delete-button { display: flex; width: max-content; margin: 14px auto 2px; }
 .detail-panel .danger-button { margin-top: 0; }
 .project-menu button { display: flex; align-items: center; gap: 8px; }
 .project-menu .project-menu-danger { color: var(--danger); }

@@ -52,7 +52,7 @@ export interface Settings {
   shortBreakMinutes: number
   longBreakMinutes: number
   longBreakEvery: number
-  autoStartBreak: boolean
+  phaseEndReminderEnabled: boolean
   dailyGoalMs: number
   switchBehavior: 'pause' | 'complete'
 }
@@ -68,7 +68,7 @@ const STORAGE_KEY = 'chronodesk-store-v2'
 
 export const defaultSettings: Settings = {
   theme: 'light', defaultMode: 'stopwatch', focusMinutes: 25, shortBreakMinutes: 5,
-  longBreakMinutes: 10, longBreakEvery: 4, autoStartBreak: false, dailyGoalMs: 8 * 60 * 60 * 1000, switchBehavior: 'pause',
+  longBreakMinutes: 10, longBreakEvery: 4, phaseEndReminderEnabled: true, dailyGoalMs: 8 * 60 * 60 * 1000, switchBehavior: 'pause',
 }
 
 export const defaultState: ChronoState = { projects: [], tasks: [], sessions: [], settings: defaultSettings }
@@ -83,7 +83,7 @@ export function loadState(): ChronoState {
       tasks: Array.isArray(parsed.tasks) ? parsed.tasks.map((task: Partial<Task>) => ({ recurrence: 'none' as TaskRecurrence, ...task })) : [],
       sessions: Array.isArray(parsed.sessions) ? parsed.sessions : [],
       projects: Array.isArray(parsed.projects) ? parsed.projects : [],
-      settings: { ...defaultSettings, ...parsed.settings },
+      settings: { ...defaultSettings, ...parsed.settings, phaseEndReminderEnabled: parsed.settings?.phaseEndReminderEnabled ?? true },
     }
     return rolloverRecurringTasks(mergeDuplicateTasks(hydrated))
   } catch { return defaultState }
