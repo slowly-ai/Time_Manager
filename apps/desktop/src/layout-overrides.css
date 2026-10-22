@@ -2572,6 +2572,19 @@ body {
   margin-top: 0;
 }
 
+.detail-title-content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.detail-edit-button {
+  min-height: 34px;
+  flex: 0 0 auto;
+  gap: 6px;
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
 /* Balance the breathing room around the dashboard content. */
 .today-page {
   padding-top: 20px;
