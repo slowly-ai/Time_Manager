@@ -2485,7 +2485,12 @@ body {
   min-height: 286px;
   height: 100%;
   align-items: stretch;
-  margin-top: 12px;
+  margin-top: 0;
+  margin-bottom: 14px;
+}
+
+.today-page .daily-metrics {
+  margin-bottom: 18px;
 }
 
 .today-page .today-layout > section {
@@ -2511,6 +2516,21 @@ body {
   align-self: stretch;
 }
 
+.today-page .task-list .task-row {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 46px 100px 30px 27px;
+  gap: 12px;
+  align-items: center;
+}
+
+.today-page .task-list .task-main,
+.today-page .task-list .task-time,
+.today-page .task-list .priority,
+.today-page .task-list .row-dismiss,
+.today-page .task-list .row-start {
+  min-width: 0;
+}
+
 @media (max-height: 760px) {
   .today-page {
     grid-template-rows: auto auto minmax(286px, 1fr) auto;
@@ -2518,9 +2538,16 @@ body {
 
   .today-page .today-layout {
     min-height: 286px;
+    margin-top: 0;
+    margin-bottom: 14px;
   }
 
   .today-page .today-layout > section {
     grid-template-rows: auto minmax(232px, 1fr);
+  }
+
+  .today-page .task-list .task-row {
+    grid-template-columns: 24px minmax(0, 1fr) 40px 84px 28px 27px;
+    gap: 8px;
   }
 }
