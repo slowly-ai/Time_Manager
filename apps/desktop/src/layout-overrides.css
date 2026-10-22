@@ -2561,3 +2561,13 @@ body {
     gap: 8px;
   }
 }
+
+/* Keep a consistent gap between the aligned work panels and today's progress. */
+.today-page .today-layout {
+  height: auto;
+  margin-bottom: 16px;
+}
+
+.today-page .progress-strip {
+  margin-top: 0;
+}
