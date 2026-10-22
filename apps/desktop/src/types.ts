@@ -68,7 +68,7 @@ const STORAGE_KEY = 'chronodesk-store-v2'
 
 export const defaultSettings: Settings = {
   theme: 'light', defaultMode: 'stopwatch', focusMinutes: 25, shortBreakMinutes: 5,
-  longBreakMinutes: 15, longBreakEvery: 4, autoStartBreak: false, dailyGoalMs: 8 * 60 * 60 * 1000, switchBehavior: 'pause',
+  longBreakMinutes: 10, longBreakEvery: 4, autoStartBreak: false, dailyGoalMs: 8 * 60 * 60 * 1000, switchBehavior: 'pause',
 }
 
 export const defaultState: ChronoState = { projects: [], tasks: [], sessions: [], settings: defaultSettings }

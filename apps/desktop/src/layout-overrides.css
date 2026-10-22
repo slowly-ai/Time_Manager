@@ -1328,6 +1328,39 @@ body {
   box-shadow: none;
 }
 
+.toast {
+  top: 50%;
+  right: auto;
+  bottom: auto;
+  left: 50%;
+  z-index: 50;
+  transform: translate(-50%, -50%);
+}
+
+.phase-prompt { display: flex; flex-direction: column; gap: 10px; color: var(--muted); }
+.phase-prompt strong { color: var(--text); font-size: 16px; }
+.phase-prompt span { font-size: 13px; }
+.focus-orphan-note { flex: 1; color: var(--muted); font-size: 12px; }
+.history-toolbar { display: flex; align-items: center; justify-content: space-between; min-height: 48px; padding: 0 18px; border-bottom: 1px solid var(--line); color: var(--muted); }
+.history-toolbar > div { display: flex; align-items: center; gap: 10px; }
+.history-toolbar .danger-button:disabled { opacity: .45; cursor: not-allowed; }
+.history-head, .history-row.history-selectable { grid-template-columns: 28px 1.6fr 1fr 1.4fr .8fr .7fr; }
+.history-selectable > input { justify-self: start; }
+.mini-history { margin-top: 12px; }
+.mini-history-toggle { display: flex; width: 100%; align-items: center; justify-content: space-between; padding: 10px 0; color: var(--text); background: transparent; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 14px; font-weight: 650; }
+.mini-history-toggle small { margin-left: 8px; color: var(--muted); font-size: 12px; font-weight: 400; }
+.mini-history-toggle svg { color: var(--muted); transition: transform .15s ease; }
+.mini-history-toggle svg.expanded { transform: rotate(180deg); }
+.mini-history-empty { display: block; padding: 12px 0; color: var(--muted); font-size: 12px; }
+.detail-delete-button { margin: 14px 0 2px; }
+.detail-panel .danger-button { margin-top: 0; }
+.project-menu button { display: flex; align-items: center; gap: 8px; }
+.project-menu .project-menu-danger { color: var(--danger); }
+
+.history-page .history-table { display: flex; flex-direction: column; }
+.history-page .history-table .history-row { flex: 0 0 auto; }
+.tasks-page .detail-panel { overflow-y: auto; scrollbar-width: thin; }
+
 .data-status i {
   background: var(--text);
 }
