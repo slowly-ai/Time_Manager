@@ -874,6 +874,23 @@ body,
   }
 }
 
+.task-main strong .today-status-prefix { display: inline; min-width: 18px; color: var(--danger); font-weight: 700; }
+.today-status-prefix.deferred { color: var(--warning); }
+.task-completed-at { display: inline; margin-left: 8px; color: var(--weak); font-size: 9px; font-weight: 400; }
+.recurrence-count { display: inline; margin-left: 8px; color: var(--muted); font-size: 9px; font-weight: 500; }
+.completed-task-panel { margin-top: 14px; padding: 18px 20px; background: var(--surface); border: 1px solid var(--line); }
+.completed-task-panel .section-heading { margin-bottom: 8px; }
+.completed-task-row { display: grid; grid-template-columns: 112px minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 42px; border-top: 1px solid var(--line); font-size: 10px; }
+.completed-task-row > span { color: var(--muted); font-family: 'DM Mono', monospace; }
+.completed-task-row > strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.completed-task-row > small { color: var(--muted); }
+@media (max-width: 720px) {
+  .completed-task-row { grid-template-columns: 1fr; gap: 3px; padding: 8px 0; }
+}
+
+.stats-page { grid-template-rows: auto auto auto; overflow-y: auto; }
+.stats-page .completed-task-panel { min-width: 0; }
+
 /* Monochrome minimal design pass: calm contrast, moderate type, and clear whitespace. */
 :root {
   --bg: #f7f7f7;

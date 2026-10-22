@@ -49,7 +49,9 @@ export interface TaskCompletion {
   id: string
   taskId: string
   day: string
-  completedAt: string
+  status: 'completed' | 'incomplete' | 'deferred'
+  completedAt?: string
+  updatedAt: string
 }
 
 export interface Settings {
@@ -94,7 +96,11 @@ export function loadState(): ChronoState {
       tasks: Array.isArray(parsed.tasks) ? parsed.tasks.map((task: Partial<Task>) => ({ recurrence: 'none' as TaskRecurrence, ...task })) : [],
       sessions: Array.isArray(parsed.sessions) ? parsed.sessions : [],
       taskCompletions: Array.isArray(parsed.taskCompletions)
-        ? parsed.taskCompletions.filter((completion: Partial<TaskCompletion>) => Boolean(completion.id && completion.taskId && completion.day && completion.completedAt))
+        ? parsed.taskCompletions.filter((completion: Partial<TaskCompletion>) => Boolean(completion.id && completion.taskId && completion.day)).map((completion: Partial<TaskCompletion>) => ({
+          ...completion,
+          status: completion.status ?? 'completed',
+          updatedAt: completion.updatedAt ?? completion.completedAt ?? new Date().toISOString(),
+        } as TaskCompletion))
         : [],
       projects: Array.isArray(parsed.projects) ? parsed.projects : [],
       settings: {
@@ -150,12 +156,19 @@ export function isTaskVisibleToday(task: Pick<Task, 'recurrence' | 'todayAddedOn
 }
 
 export function isTaskCompletedOnDay(taskId: string, completions: TaskCompletion[], day = todayKey()) {
-  return completions.some((completion) => completion.taskId === taskId && completion.day === day)
+  return completions.some((completion) => completion.taskId === taskId && completion.day === day && completion.status === 'completed')
 }
 
-export function addTaskCompletion(completions: TaskCompletion[], taskId: string, day = todayKey(), completedAt = new Date().toISOString()) {
-  if (isTaskCompletedOnDay(taskId, completions, day)) return completions
-  return [...completions, { id: createId('completion'), taskId, day, completedAt }]
+export function taskCompletionForDay(taskId: string, completions: TaskCompletion[], day = todayKey()) {
+  return completions.find((completion) => completion.taskId === taskId && completion.day === day)
+}
+
+export function setTaskCompletion(completions: TaskCompletion[], taskId: string, status: TaskCompletion['status'], day = todayKey(), completedAt?: string) {
+  const now = new Date().toISOString()
+  const next = { id: createId('completion'), taskId, day, status, completedAt: status === 'completed' ? completedAt : undefined, updatedAt: now } satisfies TaskCompletion
+  const index = completions.findIndex((completion) => completion.taskId === taskId && completion.day === day)
+  if (index < 0) return [...completions, next]
+  return completions.map((completion, itemIndex) => itemIndex === index ? { ...completion, ...next, id: completion.id } : completion)
 }
 
 export function removeTaskCompletion(completions: TaskCompletion[], taskId: string, day = todayKey()) {
@@ -235,10 +248,11 @@ export function rolloverRecurringTasks(state: ChronoState, now = Date.now()): Ch
   const todayStart = today.getTime()
   let changed = false
   const tasks = state.tasks.map((task) => {
-    if (task.recurrence !== 'daily' || task.status !== 'done' || !task.completedAt) return task
-    if (taskTimestamp(task.completedAt) >= todayStart) return task
+    if (task.recurrence !== 'daily') return task
+    const day = todayKey(now)
+    if (task.todayAddedOn && task.todayAddedOn >= day) return task
     changed = true
-    return { ...task, status: 'todo' as const, completedAt: undefined, updatedAt: new Date(now).toISOString() }
+    return { ...task, todayAddedOn: day, todayDismissedOn: undefined, status: 'todo' as const, completedAt: undefined, updatedAt: new Date(now).toISOString() }
   })
   return changed ? { ...state, tasks } : state
 }

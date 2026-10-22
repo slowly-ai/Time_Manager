@@ -20,6 +20,7 @@
         "resizable": true,
         "decorations": true,
         "center": true,
+        "skipTaskbar": false,
         "dragDropEnabled": false
       }
     ],
