@@ -2485,6 +2485,7 @@ body {
   min-height: 286px;
   height: 100%;
   align-items: stretch;
+  transform: translateY(-10px);
 }
 
 .today-page .today-layout > section {
