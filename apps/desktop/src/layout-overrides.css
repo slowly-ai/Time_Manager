@@ -2474,3 +2474,52 @@ body {
     min-height: 232px;
   }
 }
+
+/* Give the today workspace a real four-row floor instead of allowing the
+   outer 1fr track to compress the list and misalign the two panels. */
+.today-page {
+  grid-template-rows: auto auto minmax(286px, 1fr) auto;
+}
+
+.today-page .today-layout {
+  min-height: 286px;
+  height: 100%;
+  align-items: stretch;
+}
+
+.today-page .today-layout > section {
+  display: grid;
+  grid-template-rows: auto minmax(232px, 1fr);
+  align-content: stretch;
+  height: 100%;
+}
+
+.today-page .task-list {
+  min-height: 232px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.today-page .today-layout > section > .empty-state {
+  min-height: 232px;
+  height: 100%;
+}
+
+.today-page .focus-panel {
+  height: 100%;
+  align-self: stretch;
+}
+
+@media (max-height: 760px) {
+  .today-page {
+    grid-template-rows: auto auto minmax(286px, 1fr) auto;
+  }
+
+  .today-page .today-layout {
+    min-height: 286px;
+  }
+
+  .today-page .today-layout > section {
+    grid-template-rows: auto minmax(232px, 1fr);
+  }
+}
