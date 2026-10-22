@@ -1368,6 +1368,46 @@ body {
   .stats-page .bar-track { height: 108px; flex-basis: 108px; }
 }
 
+/* Compact detail spacing, retain a clear gap before the delete action. */
+.detail-panel .detail-kicker { margin-bottom: 20px; }
+.detail-panel .detail-title { margin-bottom: 4px; }
+.detail-panel .task-description { min-height: 42px; margin: 8px 0 2px; }
+.detail-panel .task-description.empty-description { padding-block: 9px; }
+.detail-panel .task-description-editor { margin: 8px 0 2px; }
+.detail-panel .task-detail-options { gap: 10px; margin-bottom: 12px; }
+.detail-panel .detail-stats { margin-bottom: 12px; }
+.detail-panel .detail-stats div { padding-block: 10px; }
+.detail-panel .detail-delete-button { margin-top: 20px; margin-bottom: 12px; }
+.detail-panel .mini-history { margin-top: 8px; }
+.detail-panel .mini-history-toggle { padding-block: 7px; }
+
+/* Dialogs fit within the app window without an internal scrollbar. */
+.modal-backdrop { padding: 14px; }
+.modal {
+  width: min(460px, 100%);
+  max-height: calc(100vh - 28px);
+  overflow: visible;
+  padding: 22px 24px;
+}
+.modal-header { margin-bottom: 16px; }
+.modal h2 { margin-top: 4px; font-size: 22px; }
+.form-label { margin-bottom: 12px; font-size: 14px; }
+.form-label input,
+.form-label select { min-height: 40px; margin-top: 5px; padding: 8px 11px; font-size: 14px; }
+.choice-row { gap: 6px; margin-top: 5px; }
+.choice-row button { min-height: 36px; padding: 6px 10px; font-size: 13px; }
+.modal-actions { gap: 9px; margin-top: 16px; padding-top: 13px; }
+@media (max-height: 740px) {
+  .modal-backdrop { padding: 10px; }
+  .modal { max-height: calc(100vh - 20px); padding: 16px 20px; }
+  .modal-header { margin-bottom: 11px; }
+  .modal h2 { font-size: 20px; }
+  .form-label { margin-bottom: 8px; }
+  .form-label input,
+  .form-label select { min-height: 36px; padding-block: 6px; }
+  .modal-actions { margin-top: 11px; padding-top: 10px; }
+}
+
 @media (max-width: 1180px) {
   .stats-chart-heading { flex-direction: column; }
   .chart-controls { max-width: 100%; flex-wrap: wrap; }
