@@ -2571,3 +2571,16 @@ body {
 .today-page .progress-strip {
   margin-top: 0;
 }
+
+/* Balance the breathing room around the dashboard content. */
+.today-page {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+@media (max-height: 760px) {
+  .today-page {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+}
