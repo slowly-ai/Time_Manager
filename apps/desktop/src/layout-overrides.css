@@ -2489,26 +2489,33 @@ body {
   margin-bottom: 14px;
 }
 
+.today-page {
+  --today-task-row-height: 56px;
+  --today-task-list-height: calc(var(--today-task-row-height) * 4 + 2px);
+}
+
 .today-page .daily-metrics {
   margin-bottom: 18px;
 }
 
 .today-page .today-layout > section {
   display: grid;
-  grid-template-rows: auto minmax(232px, 1fr);
+  grid-template-rows: auto var(--today-task-list-height);
   align-content: stretch;
   height: 100%;
 }
 
 .today-page .task-list {
-  min-height: 232px;
-  height: 100%;
+  min-height: var(--today-task-list-height);
+  height: var(--today-task-list-height);
+  max-height: var(--today-task-list-height);
+  flex: 0 0 var(--today-task-list-height);
   overflow-y: auto;
 }
 
 .today-page .today-layout > section > .empty-state {
-  min-height: 232px;
-  height: 100%;
+  min-height: var(--today-task-list-height);
+  height: var(--today-task-list-height);
 }
 
 .today-page .focus-panel {
@@ -2521,6 +2528,9 @@ body {
   grid-template-columns: 24px minmax(0, 1fr) 46px 100px 30px 27px;
   gap: 12px;
   align-items: center;
+  min-height: var(--today-task-row-height);
+  height: var(--today-task-row-height);
+  max-height: var(--today-task-row-height);
 }
 
 .today-page .task-list .task-main,
@@ -2543,7 +2553,7 @@ body {
   }
 
   .today-page .today-layout > section {
-    grid-template-rows: auto minmax(232px, 1fr);
+    grid-template-rows: auto var(--today-task-list-height);
   }
 
   .today-page .task-list .task-row {
