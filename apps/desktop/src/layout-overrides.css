@@ -1524,9 +1524,17 @@ body {
 .mini-history-toggle svg { color: var(--muted); transition: transform .15s ease; }
 .mini-history-toggle svg.expanded { transform: rotate(180deg); }
 .mini-history-empty { display: block; padding: 12px 0; color: var(--muted); font-size: 12px; }
-.detail-delete-button { display: flex; width: max-content; margin: 14px auto 2px; }
+.detail-delete-button {
+  display: flex;
+  width: max-content;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 14px auto 2px;
+}
+.detail-delete-button svg { flex: 0 0 auto; }
 .detail-panel .danger-button { margin-top: 0; }
-.detail-panel .detail-delete-button { margin-top: 38px; margin-bottom: 16px; }
+.detail-panel .detail-delete-button { margin: 16px auto 8px; }
 .project-menu button { display: flex; align-items: center; gap: 8px; }
 .project-menu .project-menu-danger { color: var(--danger); }
 
@@ -2731,8 +2739,8 @@ body {
 
 .today-page .task-list .task-row {
   display: grid;
-  grid-template-columns: 24px minmax(0, 1fr) 46px 100px 30px 27px;
-  gap: 12px;
+  grid-template-columns: 24px minmax(0, 1fr) max-content 100px 30px;
+  gap: 10px;
   align-items: center;
   min-height: var(--today-task-row-height);
   height: var(--today-task-row-height);
@@ -2745,6 +2753,50 @@ body {
 .today-page .task-list .row-dismiss,
 .today-page .task-list .row-start {
   min-width: 0;
+}
+
+/* Keep settings controls in one aligned column and give every numeric field
+   the same footprint, including the paired break duration inputs. */
+.settings-content .setting-row {
+  gap: 18px;
+}
+
+.setting-control {
+  display: flex;
+  flex: 0 0 232px;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.setting-control .number-field {
+  box-sizing: border-box;
+  width: 112px;
+  height: 40px;
+  flex: 0 0 112px;
+}
+
+.setting-control .number-field input {
+  box-sizing: border-box;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.setting-control .inline-fields {
+  width: 100%;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@media (max-width: 760px) {
+  .settings-content .setting-row {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+
+  .setting-control {
+    margin-left: auto;
+  }
 }
 
 @media (max-height: 760px) {
@@ -2763,7 +2815,7 @@ body {
   }
 
   .today-page .task-list .task-row {
-    grid-template-columns: 24px minmax(0, 1fr) 40px 84px 28px 27px;
+    grid-template-columns: 24px minmax(0, 1fr) max-content 84px 28px;
     gap: 8px;
   }
 }
@@ -2776,6 +2828,31 @@ body {
 
 .today-page .progress-strip {
   margin-top: 0;
+}
+
+.today-task-action-message {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.today-task-action-message strong {
+  color: var(--text);
+  font-size: 16px;
+}
+
+.today-task-action-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.today-task-action-options button {
+  justify-content: center;
 }
 
 .detail-title-content {

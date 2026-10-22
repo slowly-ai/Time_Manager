@@ -45,6 +45,13 @@ export interface FocusSession {
   status: SessionStatus
 }
 
+export interface TaskCompletion {
+  id: string
+  taskId: string
+  day: string
+  completedAt: string
+}
+
 export interface Settings {
   theme: 'light' | 'dark' | 'system'
   defaultMode: TimerMode
@@ -63,6 +70,7 @@ export interface ChronoState {
   projects: Project[]
   tasks: Task[]
   sessions: FocusSession[]
+  taskCompletions: TaskCompletion[]
   settings: Settings
 }
 
@@ -74,7 +82,7 @@ export const defaultSettings: Settings = {
   phaseEndReminderEnabled: true, dailyGoalMs: 8 * 60 * 60 * 1000, switchBehavior: 'pause',
 }
 
-export const defaultState: ChronoState = { projects: [], tasks: [], sessions: [], settings: defaultSettings }
+export const defaultState: ChronoState = { projects: [], tasks: [], sessions: [], taskCompletions: [], settings: defaultSettings }
 
 export function loadState(): ChronoState {
   try {
@@ -85,6 +93,9 @@ export function loadState(): ChronoState {
       ...parsed,
       tasks: Array.isArray(parsed.tasks) ? parsed.tasks.map((task: Partial<Task>) => ({ recurrence: 'none' as TaskRecurrence, ...task })) : [],
       sessions: Array.isArray(parsed.sessions) ? parsed.sessions : [],
+      taskCompletions: Array.isArray(parsed.taskCompletions)
+        ? parsed.taskCompletions.filter((completion: Partial<TaskCompletion>) => Boolean(completion.id && completion.taskId && completion.day && completion.completedAt))
+        : [],
       projects: Array.isArray(parsed.projects) ? parsed.projects : [],
       settings: {
         ...defaultSettings,
@@ -126,10 +137,29 @@ export function todayKey(now = Date.now()) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 }
 
+export function tomorrowKey(now = Date.now()) {
+  const date = new Date(now)
+  date.setDate(date.getDate() + 1)
+  return todayKey(date.getTime())
+}
+
 export function isTaskVisibleToday(task: Pick<Task, 'recurrence' | 'todayAddedOn' | 'todayDismissedOn'>, day = todayKey()) {
   if (task.todayDismissedOn === day) return false
   if (task.recurrence === 'daily') return task.todayAddedOn === day
   return !task.todayAddedOn || task.todayAddedOn === day
+}
+
+export function isTaskCompletedOnDay(taskId: string, completions: TaskCompletion[], day = todayKey()) {
+  return completions.some((completion) => completion.taskId === taskId && completion.day === day)
+}
+
+export function addTaskCompletion(completions: TaskCompletion[], taskId: string, day = todayKey(), completedAt = new Date().toISOString()) {
+  if (isTaskCompletedOnDay(taskId, completions, day)) return completions
+  return [...completions, { id: createId('completion'), taskId, day, completedAt }]
+}
+
+export function removeTaskCompletion(completions: TaskCompletion[], taskId: string, day = todayKey()) {
+  return completions.filter((completion) => !(completion.taskId === taskId && completion.day === day))
 }
 
 export function addTaskToToday(task: Task, day = todayKey()): Task {
@@ -138,6 +168,10 @@ export function addTaskToToday(task: Task, day = todayKey()): Task {
 
 export function dismissTaskForToday(task: Task, day = todayKey()): Task {
   return { ...task, todayDismissedOn: day, status: 'todo', completedAt: undefined }
+}
+
+export function deferTaskForTomorrow(task: Task, day = todayKey()): Task {
+  return { ...task, todayAddedOn: tomorrowKey(new Date(`${day}T00:00:00`).getTime()), todayDismissedOn: undefined, status: 'todo', completedAt: undefined }
 }
 
 export function isRecordableSession(session: FocusSession, now = Date.now()) {
@@ -191,6 +225,7 @@ export function mergeDuplicateTasks(state: ChronoState): ChronoState {
       const taskId = taskIdMap.get(session.taskId) ?? session.taskId
       return taskId === session.taskId ? session : { ...session, taskId }
     }),
+    taskCompletions: state.taskCompletions.map((completion) => ({ ...completion, taskId: taskIdMap.get(completion.taskId) ?? completion.taskId })),
   }
 }
 
