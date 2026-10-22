@@ -2439,3 +2439,38 @@ body {
 @media (max-height: 740px) {
   .today-page .task-list { min-height: 236px; }
 }
+
+/* Keep the two today-workspace panels on one baseline while reserving four
+   complete task rows before the list starts scrolling. */
+.today-page .today-layout {
+  min-height: 286px;
+  align-items: stretch;
+  margin-bottom: 20px;
+}
+
+.today-page .today-layout > section,
+.today-page .focus-panel {
+  height: 100%;
+  min-height: 0;
+}
+
+.today-page .focus-panel {
+  max-height: none;
+}
+
+.today-page .task-list {
+  flex: 1 1 auto;
+  min-height: 232px;
+  max-height: none;
+}
+
+@media (max-height: 760px) {
+  .today-page .today-layout {
+    min-height: 278px;
+    margin-bottom: 16px;
+  }
+
+  .today-page .task-list {
+    min-height: 232px;
+  }
+}
