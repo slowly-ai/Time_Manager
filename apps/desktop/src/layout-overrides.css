@@ -1486,6 +1486,7 @@ body {
 .mini-history-empty { display: block; padding: 12px 0; color: var(--muted); font-size: 12px; }
 .detail-delete-button { display: flex; width: max-content; margin: 14px auto 2px; }
 .detail-panel .danger-button { margin-top: 0; }
+.detail-panel .detail-delete-button { margin-top: 38px; margin-bottom: 16px; }
 .project-menu button { display: flex; align-items: center; gap: 8px; }
 .project-menu .project-menu-danger { color: var(--danger); }
 
