@@ -2823,7 +2823,8 @@ body {
   width: 14px;
   height: 14px;
   flex: 0 0 14px;
-  transform: translateY(1px);
+  align-self: center;
+  transform: translateY(2px);
 }
 .bulk-actions .danger-button { gap: 6px; }
 .project-menu button { gap: 7px; }
