@@ -281,18 +281,17 @@ function MainApp() {
   function openTodayTaskAction(taskId: string) { const task = state.tasks.find((item) => item.id === taskId); if (!task) return; if (activeSessions.some((session) => session.taskId === taskId)) return notify('当前任务正在计时，请先结束计时'); setTodayTaskAction(task) }
   function cancelTodayTask(taskId: string) {
     if (activeSessions.some((session) => session.taskId === taskId)) return notify('请先结束计时，再取消今天的安排')
+    const task = state.tasks.find((item) => item.id === taskId)
+    if (!task) return
     const iso = new Date().toISOString()
     update((current) => ({
       ...current,
-      tasks: current.tasks.map((task) => task.id === taskId ? {
-        ...task,
-        todayDismissedOn: dayKey,
-        ...(task.recurrence === 'none' ? { status: 'todo' as const, completedAt: undefined } : {}),
-        updatedAt: iso,
-      } : task),
+      tasks: task.recurrence === 'none'
+        ? current.tasks.filter((item) => item.id !== taskId)
+        : current.tasks.map((item) => item.id === taskId ? { ...item, todayDismissedOn: dayKey, updatedAt: iso } : item),
       taskCompletions: removeTaskCompletion(current.taskCompletions, taskId, dayKey),
     }))
-    notify('已取消今天的任务安排，任务仍保留在所有任务中')
+    notify(task.recurrence === 'none' ? '已取消创建任务' : '已取消今天的任务安排，长期任务仍保留在所有任务中')
   }
   function setTodayTaskStatus(taskId: string, status: 'incomplete' | 'deferred') {
     if (activeSessions.some((session) => session.taskId === taskId)) return notify('当前任务正在计时，请先结束计时')
