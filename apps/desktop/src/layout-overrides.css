@@ -3126,11 +3126,13 @@ body {
   min-height: 34px;
   height: 34px;
   padding: 0 12px;
-  min-width: 132px;
+  min-width: 156px;
+  width: 156px;
   align-items: center;
   justify-content: center;
   gap: 6px;
   line-height: 14px;
+  white-space: nowrap;
 }
 
 .today-task-action-delete .danger-button svg {
