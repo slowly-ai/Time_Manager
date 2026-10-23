@@ -1913,6 +1913,101 @@ body.timer-widget-body {
 .timer-widget-actions button { width: 29px; height: 29px; border-radius: 7px; }
 .timer-widget-actions button svg { width: 14px; height: 14px; }
 
+.timer-widget-root {
+  display: flex;
+  flex-direction: column;
+  padding: 9px 10px;
+}
+
+.timer-widget-list {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 5px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.timer-widget-session {
+  display: grid;
+  min-height: 38px;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 4px 4px 6px;
+  border: 1px solid #e2e2e2;
+  border-radius: 7px;
+  background: #fafafa;
+  cursor: pointer;
+}
+
+.timer-widget-session:hover {
+  background: #f1f1f1;
+}
+
+.timer-widget-root[data-theme='dark'] .timer-widget-session {
+  border-color: #444;
+  background: #292929;
+}
+
+.timer-widget-root[data-theme='dark'] .timer-widget-session:hover {
+  background: #333;
+}
+
+.timer-widget-session-info {
+  min-width: 0;
+}
+
+.timer-widget-session-info strong,
+.timer-widget-session-info span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timer-widget-session-info strong {
+  color: inherit;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.timer-widget-session-info span {
+  margin-top: 1px;
+  color: #777;
+  font-size: 9px;
+}
+
+.timer-widget-root[data-theme='dark'] .timer-widget-session-info span {
+  color: #aaa;
+}
+
+.timer-widget-session time {
+  color: inherit;
+  font-family: 'DM Mono', Consolas, monospace;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -.04em;
+  white-space: nowrap;
+}
+
+.timer-widget-session .timer-widget-actions {
+  gap: 3px;
+}
+
+.timer-widget-session .timer-widget-actions button {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+}
+
+.timer-widget-session .timer-widget-actions button svg {
+  width: 12px;
+  height: 12px;
+}
+
 @media (max-width: 900px) {
   .page h1 { font-size: 31px; }
   .history-head, .history-row { grid-template-columns: 1.5fr 1fr 1.3fr .8fr .8fr; gap: 8px; }

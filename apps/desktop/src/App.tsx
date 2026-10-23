@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { BarChart3, Check, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, Clock3, Download, FolderKanban, History, LayoutDashboard, Monitor, Moon, MoreHorizontal, Pause, Pencil, Play, Plus, Settings, Sun, Target, Trash2, Trophy, X } from 'lucide-react'
 import { emit, emitTo, listen } from '@tauri-apps/api/event'
 import { WebviewWindow } from '@tauri-apps/api/webviewWindow'
+import { LogicalPosition, LogicalSize } from '@tauri-apps/api/dpi'
 import { currentMonitor, getCurrentWindow } from '@tauri-apps/api/window'
 import { addTaskToToday, createId, formatDuration, isFocusSession, isRecordableSession, isTaskVisibleToday, loadState, normalizeTaskKey, removeTaskCompletion, rolloverRecurringTasks, saveState, sessionElapsed, setTaskCompletion, taskCompletionForDay, todayKey, tomorrowKey, type ChronoState, type FocusSession, type PomodoroPhase, type Priority, type Project, type Task, type TaskRecurrence, type TimerMode } from './types'
 
@@ -9,8 +10,9 @@ type View = 'today' | 'tasks' | 'projects' | 'history' | 'stats' | 'settings'
 type SettingsSection = 'preferences' | 'appearance' | 'data'
 const colors = ['#334155', '#52677f', '#71869b', '#7c849e', '#668b8b']
 const priorityNames: Record<Priority, string> = { high: '高', medium: '中', low: '低' }
-type TimerWidgetPayload = { taskTitle: string; elapsedMs: number; status: FocusSession['status']; phase: PomodoroPhase; theme: 'light' | 'dark' }
-type TimerWidgetAction = { action: 'pause' | 'resume' | 'finish' }
+type TimerWidgetSession = { timerId: string; taskId: string; taskTitle: string; elapsedMs: number; status: 'running' | 'paused'; phase: PomodoroPhase }
+type TimerWidgetPayload = { sessions: TimerWidgetSession[]; theme: 'light' | 'dark' }
+type TimerWidgetAction = { action: 'pause' | 'resume' | 'finish'; timerId: string }
 type TaskDraft = { title: string; projectId: string; priority: Priority; plannedMinutes: number; recurrence: TaskRecurrence }
 type ProjectDraft = { id?: string; name: string; color: string }
 type DuplicateCandidate = { draft: TaskDraft; existing: Task; recurringExists: boolean }
@@ -68,7 +70,6 @@ function MainApp() {
   const active = selectedSession ?? (!preferredActiveTaskId ? activeSessions.find((session) => session.id === activeTimerId) ?? activeSessions[0] : undefined)
   const backgroundActive = activeSessions.find((session) => session.id === activeTimerId) ?? activeSessions[0]
   const activeTask = state.tasks.find((task) => task.id === active?.taskId) ?? state.tasks.find((task) => task.id === preferredActiveTaskId)
-  const backgroundTask = state.tasks.find((task) => task.id === backgroundActive?.taskId)
   const todayStart = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime() }, [now])
   const dayKey = todayKey(now)
   const todaySessions = state.sessions.filter((session) => new Date(session.startedAt).getTime() >= todayStart)
@@ -118,29 +119,51 @@ function MainApp() {
     if (!isTauriRuntime()) return
     let unlisten: (() => void) | undefined
     void listen<TimerWidgetAction>('timer-widget-action', ({ payload }) => {
-      if (payload.action === 'pause') pauseTimer()
-      if (payload.action === 'resume') resumeTimer()
-      if (payload.action === 'finish') finishTimer()
+      if (payload.action === 'pause') pauseTimer(payload.timerId)
+      if (payload.action === 'resume') resumeTimer(payload.timerId)
+      if (payload.action === 'finish') finishTimer(false, payload.timerId)
     }).then((stop) => { unlisten = stop })
     return () => unlisten?.()
-  }, [active?.id, active?.status, now])
+  }, [active?.id, active?.status, now, activeSessions])
+  useEffect(() => {
+    if (!isTauriRuntime()) return
+    let unlisten: (() => void) | undefined
+    void listen<{ taskId: string }>('timer-widget-select', ({ payload }) => {
+      if (!payload?.taskId) return
+      setSelectedTaskId(payload.taskId)
+      setTodaySelectedTaskId(payload.taskId)
+      setView('today')
+    }).then((stop) => { unlisten = stop })
+    return () => unlisten?.()
+  }, [])
   useEffect(() => {
     if (!isTauriRuntime()) return
     let cancelled = false
     const syncWidget = async () => {
       const widget = await WebviewWindow.getByLabel('timer-widget')
-      if (!backgroundActive) {
+      if (!activeSessions.length) {
         await widget?.close().catch(() => undefined)
         return
       }
       const payload: TimerWidgetPayload = {
-        taskTitle: backgroundTask?.title ?? '任务已删除',
-        elapsedMs: sessionElapsed(backgroundActive, now),
-        status: backgroundActive.status,
-        phase: backgroundActive.phase,
+        sessions: activeSessions.map((session) => ({
+          timerId: session.id,
+          taskId: session.taskId,
+          taskTitle: state.tasks.find((task) => task.id === session.taskId)?.title ?? '任务已删除',
+          elapsedMs: sessionElapsed(session, now),
+          status: session.status as 'running' | 'paused',
+          phase: session.phase,
+        })),
         theme: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light',
       }
+      const width = activeSessions.length === 1 ? 220 : 240
+      const height = activeSessions.length === 1 ? 80 : Math.min(180, 38 + Math.min(activeSessions.length, 3) * 42)
       if (widget) {
+        await widget.setSize(new LogicalSize(width, height)).catch(() => undefined)
+        const monitor = await currentMonitor()
+        const workPosition = monitor?.workArea.position.toLogical(monitor.scaleFactor)
+        const workSize = monitor?.workArea.size.toLogical(monitor.scaleFactor)
+        if (workPosition && workSize) await widget.setPosition(new LogicalPosition(workPosition.x + workSize.width - width - 16, workPosition.y + workSize.height - height - 16)).catch(() => undefined)
         await emitTo('timer-widget', 'timer-widget-state', payload).catch(() => undefined)
         return
       }
@@ -148,9 +171,7 @@ function MainApp() {
       widgetCreationPending.current = true
       const monitor = await currentMonitor()
       if (cancelled) { widgetCreationPending.current = false; return }
-      const width = 260
-      const height = 112
-      const margin = 20
+      const margin = 16
       const workPosition = monitor?.workArea.position.toLogical(monitor.scaleFactor)
       const workSize = monitor?.workArea.size.toLogical(monitor.scaleFactor)
       const timerWidget = new WebviewWindow('timer-widget', {
@@ -177,7 +198,7 @@ function MainApp() {
     }
     void syncWidget().catch(() => undefined)
     return () => { cancelled = true }
-  }, [backgroundActive, backgroundTask, now, state.settings.theme, widgetReady])
+  }, [activeSessions, now, state.tasks, state.settings.theme, widgetReady])
   useEffect(() => {
     if (!backgroundActive || backgroundActive.status !== 'running') return
     const elapsed = sessionElapsed(backgroundActive, now)
@@ -312,7 +333,7 @@ function MainApp() {
 }
 
 function TimerWidget() {
-  const [timer, setTimer] = useState<TimerWidgetPayload>({ taskTitle: '正在同步计时', elapsedMs: 0, status: 'paused', phase: 'focus', theme: 'light' })
+  const [timer, setTimer] = useState<TimerWidgetPayload>({ sessions: [], theme: 'light' })
   const lastSync = useRef(Date.now())
   const [now, setNow] = useState(Date.now())
   const widgetWindow = isTauriRuntime() ? getCurrentWindow() : undefined
@@ -325,21 +346,26 @@ function TimerWidget() {
     void emit('timer-widget-ready')
     return () => unlisten?.()
   }, [])
-  const elapsed = timer.status === 'running' ? timer.elapsedMs + (now - lastSync.current) : timer.elapsedMs
-  const phaseLabel = timer.phase === 'focus' ? '专注中' : timer.phase === 'short_break' ? '短休息' : '长休息'
-  const sendAction = (action: TimerWidgetAction['action']) => { if (isTauriRuntime()) void emit('timer-widget-action', { action } satisfies TimerWidgetAction) }
+  const elapsedFor = (session: TimerWidgetSession) => session.status === 'running' ? session.elapsedMs + (now - lastSync.current) : session.elapsedMs
+  const phaseLabel = (phase: PomodoroPhase) => phase === 'focus' ? '专注中' : phase === 'short_break' ? '短休息' : '长休息'
+  const sendAction = (timerId: string, action: TimerWidgetAction['action']) => { if (isTauriRuntime()) void emit('timer-widget-action', { action, timerId } satisfies TimerWidgetAction) }
   return <div className="timer-widget-root" data-theme={timer.theme}>
     <div className="timer-widget-drag" data-tauri-drag-region onMouseDown={() => { if (isTauriRuntime()) void widgetWindow?.startDragging() }}>
-      <span>{phaseLabel}{timer.status === 'paused' ? ' · 已暂停' : ''}</span>
+      <span>{timer.sessions.length} 个专注任务</span>
       <Clock3 size={16} />
     </div>
-    <strong title={timer.taskTitle}>{timer.taskTitle}</strong>
-    <div className="timer-widget-footer">
-      <time>{formatDuration(elapsed)}</time>
-      <div className="timer-widget-actions">
-        <button className="timer-widget-pause" onClick={() => sendAction(timer.status === 'running' ? 'pause' : 'resume')} aria-label={timer.status === 'running' ? '暂停计时' : '继续计时'}>{timer.status === 'running' ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" />}</button>
-        <button className="timer-widget-finish" onClick={() => sendAction('finish')} aria-label="结束并保存"><Check size={16} /></button>
-      </div>
+    <div className="timer-widget-list">
+      {timer.sessions.map((session) => <div className="timer-widget-session" key={session.timerId} onClick={() => { if (isTauriRuntime()) void emit('timer-widget-select', { taskId: session.taskId }) }}>
+        <div className="timer-widget-session-info" title={session.taskTitle}>
+          <strong>{session.taskTitle}</strong>
+          <span>{phaseLabel(session.phase)}{session.status === 'paused' ? ' · 已暂停' : ''}</span>
+        </div>
+        <time>{formatDuration(elapsedFor(session))}</time>
+        <div className="timer-widget-actions">
+          <button className="timer-widget-pause" onClick={() => sendAction(session.timerId, session.status === 'running' ? 'pause' : 'resume')} aria-label={session.status === 'running' ? `暂停${session.taskTitle}` : `继续${session.taskTitle}`}>{session.status === 'running' ? <Pause size={13} fill="currentColor" /> : <Play size={13} fill="currentColor" />}</button>
+          <button className="timer-widget-finish" onClick={() => sendAction(session.timerId, 'finish')} aria-label={`结束并保存${session.taskTitle}`}><Check size={13} /></button>
+        </div>
+      </div>)}
     </div>
   </div>
 }
