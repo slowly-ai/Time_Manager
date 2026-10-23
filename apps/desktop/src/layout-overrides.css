@@ -3334,6 +3334,15 @@ body[data-dialog-mode="today-add"] .modal-actions .secondary-button::after {
   flex: 1 1 auto;
 }
 
+/* Keep the empty-list description centered against the task panel itself. */
+.today-page .today-layout > section:first-child > .empty-state > span {
+  display: block;
+  width: 100%;
+  margin: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
 .today-page .today-layout > .focus-panel {
   height: 100%;
   min-height: 0;
