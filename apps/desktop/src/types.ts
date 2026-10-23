@@ -250,7 +250,7 @@ export function rolloverRecurringTasks(state: ChronoState, now = Date.now()): Ch
   const tasks = state.tasks.map((task) => {
     if (task.recurrence !== 'daily') return task
     const day = todayKey(now)
-    if (task.todayAddedOn && task.todayAddedOn >= day) return task
+    if (task.todayDismissedOn === day || (task.todayAddedOn && task.todayAddedOn >= day)) return task
     changed = true
     return { ...task, todayAddedOn: day, todayDismissedOn: undefined, status: 'todo' as const, completedAt: undefined, updatedAt: new Date(now).toISOString() }
   })

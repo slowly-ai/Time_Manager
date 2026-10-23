@@ -874,8 +874,24 @@ body,
   }
 }
 
-.task-main strong .today-status-prefix { display: inline; min-width: 18px; color: var(--danger); font-weight: 700; }
-.today-status-prefix.deferred { color: var(--warning); }
+.check-box.today-status-incomplete,
+.check-box.today-status-deferred { background: var(--surface); border-color: var(--line-strong, var(--line)); }
+.check-box .today-status-mark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: 1em;
+  height: 1em;
+  place-items: center;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+.check-box.today-status-incomplete .today-status-mark { color: var(--danger); }
+.check-box.today-status-deferred .today-status-mark { color: var(--warning); }
 .task-completed-at { display: inline; margin-left: 8px; color: var(--weak); font-size: 9px; font-weight: 400; }
 .recurrence-count { display: inline; margin-left: 8px; color: var(--muted); font-size: 9px; font-weight: 500; }
 .completed-task-panel { margin-top: 14px; padding: 18px 20px; background: var(--surface); border: 1px solid var(--line); }
@@ -884,6 +900,41 @@ body,
 .completed-task-row > span { color: var(--muted); font-family: 'DM Mono', monospace; }
 .completed-task-row > strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .completed-task-row > small { color: var(--muted); }
+.completed-task-heading-actions { display: inline-flex; align-items: center; gap: 12px; }
+.stats-page .bar-column {
+  appearance: none;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+}
+.stats-page .bar-column:hover .bar-track,
+.stats-page .bar-column:focus-visible .bar-track,
+.stats-page .bar-column.selected .bar-track { border-color: var(--text); }
+.stats-page .bar-column.selected small,
+.stats-page .bar-column:focus-visible small { color: var(--text); font-weight: 700; }
+.stats-page .bar-column:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+.stats-page .analytics-grid { overflow: visible; }
+.stats-page .chart-panel { overflow: hidden; }
+.stats-page .completed-task-panel { overflow: hidden; }
+.stats-page {
+  grid-template-rows: auto auto auto;
+  align-content: start;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.stats-page .analytics-grid {
+  height: 286px;
+  min-height: 286px;
+}
+.stats-page .completed-task-panel { min-height: 112px; }
+@media (max-height: 740px) {
+  .stats-page .analytics-grid { height: 242px; min-height: 242px; }
+  .stats-page .completed-task-panel { min-height: 96px; }
+}
 @media (max-width: 720px) {
   .completed-task-row { grid-template-columns: 1fr; gap: 3px; padding: 8px 0; }
 }
@@ -1796,7 +1847,9 @@ body.timer-widget-body {
   width: 22px;
   height: 22px;
   flex-basis: 22px;
+  padding: 0;
   line-height: 0;
+  text-align: center;
   place-items: center;
 }
 .check-box.checked { background: #171717; border-color: #171717; }
@@ -2597,6 +2650,20 @@ body {
   font-size: 13px;
 }
 
+/* Keep timer action icons and labels on one centered baseline. */
+.focus-actions > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  line-height: 1;
+}
+
+.focus-actions > button > svg {
+  flex: 0 0 16px;
+  display: block;
+}
+
 .today-page .focus-hint {
   flex: 0 0 auto;
   margin-top: 8px;
@@ -2872,6 +2939,38 @@ body {
   justify-content: center;
 }
 
+.today-task-action-delete {
+  display: flex;
+  justify-content: center;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.today-task-action-delete .danger-button {
+  display: inline-flex;
+  min-width: 132px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* The creation prompt uses explicit 是/否 actions while other confirmations keep 取消. */
+body[data-dialog-mode="today-add"] .modal-actions .secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0;
+  line-height: 1;
+}
+
+body[data-dialog-mode="today-add"] .modal-actions .secondary-button::after {
+  content: '否';
+  display: block;
+  font-size: 13px;
+  line-height: 1;
+}
+
 .detail-title-content {
   flex: 1 1 auto;
   min-width: 0;
@@ -2895,5 +2994,188 @@ body {
   .today-page {
     padding-top: 16px;
     padding-bottom: 16px;
+  }
+}
+
+/* Final statistics layout override: keep chart labels visible in the page
+   viewport instead of compressing them into an internally scrolling grid. */
+.page:has(> .stats-grid) {
+  grid-template-rows: auto auto auto;
+  align-content: start;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.page:has(> .stats-grid) > .analytics-grid {
+  min-height: 286px;
+  height: 286px;
+  overflow: visible;
+}
+.page:has(> .stats-grid) > .analytics-grid > .chart-panel {
+  min-height: 286px;
+  height: 286px;
+  overflow: visible;
+}
+.page:has(> .stats-grid) .bar-chart {
+  box-sizing: border-box;
+  padding-bottom: 16px;
+}
+.page:has(> .stats-grid) .bar-track {
+  height: 110px;
+  flex-basis: 110px;
+}
+.page:has(> .stats-grid) > .completed-task-panel {
+  min-height: 112px;
+  overflow: visible;
+}
+@media (max-height: 740px) {
+  .page:has(> .stats-grid) > .analytics-grid,
+  .page:has(> .stats-grid) > .analytics-grid > .chart-panel {
+    min-height: 242px;
+    height: 242px;
+  }
+  .page:has(> .stats-grid) .bar-track { height: 92px; flex-basis: 92px; }
+  .page:has(> .stats-grid) > .completed-task-panel { min-height: 96px; }
+}
+
+/* Keep the day labels inside the chart card at short viewport heights. */
+.page:has(> .stats-grid) > .analytics-grid > .chart-panel {
+  overflow: hidden;
+}
+.page:has(> .stats-grid) .stats-chart-heading {
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.page:has(> .stats-grid) .bar-chart {
+  height: 148px;
+  min-height: 148px;
+  max-height: 148px;
+  padding: 6px 2px 14px;
+}
+.page:has(> .stats-grid) .bar-track {
+  height: 98px;
+  flex-basis: 98px;
+}
+@media (max-height: 740px) {
+  .page:has(> .stats-grid) .bar-chart {
+    height: 122px;
+    min-height: 122px;
+    max-height: 122px;
+    padding: 4px 1px 13px;
+  }
+  .page:has(> .stats-grid) .bar-track { height: 74px; flex-basis: 74px; }
+}
+
+/* Let completion rows expand the panel instead of escaping its border. */
+.page:has(> .stats-grid) > .completed-task-panel {
+  box-sizing: border-box;
+  height: max-content;
+  min-height: 168px;
+  overflow: visible;
+}
+
+/* Keep the today workspace compact and make the task area a peer card of the
+   focus panel. The task rows stay at the top; spare height belongs below them. */
+.today-page .today-layout {
+  align-self: start;
+  height: clamp(286px, 38vh, 330px);
+  min-height: 286px;
+  margin-bottom: 22px;
+}
+
+.today-page .today-layout > section:first-child {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  padding: 18px 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 3px 0 rgba(20, 20, 20, .055);
+}
+
+.today-page .today-layout > section:first-child > .section-heading {
+  flex: 0 0 auto;
+  margin: 0 0 10px;
+}
+
+.today-page .today-layout > section:first-child > .task-list,
+.today-page .today-layout > section:first-child > .empty-state {
+  width: auto;
+  margin: 0 -20px -18px;
+  border: 0;
+  border-radius: 0 0 14px 14px;
+}
+
+.today-page .today-layout > section:first-child > .task-list {
+  height: auto;
+  min-height: 0;
+  max-height: 224px;
+  flex: 0 1 auto;
+  overflow-y: auto;
+}
+
+.today-page .today-layout > section:first-child > .empty-state {
+  min-height: 180px;
+  flex: 1 1 auto;
+}
+
+.today-page .today-layout > .focus-panel {
+  height: 100%;
+  min-height: 0;
+  align-self: stretch;
+}
+
+.today-page .progress-strip {
+  position: relative;
+  z-index: 1;
+  margin-top: 0;
+}
+
+/* Keep appearance choices in one centered horizontal control group. */
+.settings-content-appearance .setting-control {
+  flex: 0 0 260px;
+  justify-content: center;
+}
+
+.settings-content-appearance .theme-segmented {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  gap: 2px;
+}
+
+.settings-content-appearance .theme-segmented button {
+  display: inline-flex;
+  min-width: 0;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  writing-mode: horizontal-tb;
+}
+
+/* Center the chart title against the full chart card, rather than its text
+   block's intrinsic width. */
+.stats-page .stats-chart-heading > div:first-child {
+  width: 100%;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .today-page .today-layout {
+    height: auto;
+    min-height: 0;
+    margin-bottom: 16px;
+  }
+
+  .today-page .today-layout > section:first-child {
+    min-height: 286px;
+  }
+
+  .today-page .today-layout > .focus-panel {
+    height: auto;
+    min-height: 286px;
   }
 }
