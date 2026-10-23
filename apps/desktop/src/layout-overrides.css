@@ -2818,11 +2818,12 @@ body {
   line-height: 1;
 }
 .bulk-actions .danger-button svg,
-.project-menu button svg {
+.project-menu .project-menu-danger svg {
   display: block;
   width: 14px;
   height: 14px;
   flex: 0 0 14px;
+  transform: translateY(1px);
 }
 .bulk-actions .danger-button { gap: 6px; }
 .project-menu button { gap: 7px; }
