@@ -3044,10 +3044,21 @@ body {
 
 .today-task-action-delete .danger-button {
   display: inline-flex;
+  min-height: 34px;
+  height: 34px;
+  padding: 0 12px;
   min-width: 132px;
   align-items: center;
   justify-content: center;
   gap: 6px;
+  line-height: 1;
+}
+
+.today-task-action-delete .danger-button svg {
+  display: block;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
 }
 
 /* The creation prompt uses explicit 是/否 actions while other confirmations keep 取消. */
