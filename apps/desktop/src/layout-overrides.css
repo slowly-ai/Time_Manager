@@ -2824,7 +2824,7 @@ body {
   height: 14px;
   flex: 0 0 14px;
   align-self: center;
-  transform: translateY(2px);
+  transform: none;
 }
 .bulk-actions .danger-button { gap: 6px; }
 .project-menu button { gap: 7px; }
@@ -2845,6 +2845,29 @@ body {
 .add-today-detail:disabled { cursor: default; opacity: .6; }
 .detail-panel .task-description { margin: 10px 0 4px; }
 .detail-panel .task-description-editor { margin: 10px 0 4px; }
+
+/* Keep every delete icon and label on the same visual center line. */
+.today-task-action-delete .danger-button,
+.bulk-actions .danger-button,
+.project-menu .project-menu-danger,
+.detail-panel .detail-delete-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 14px;
+}
+
+.today-task-action-delete .danger-button svg,
+.bulk-actions .danger-button svg,
+.project-menu .project-menu-danger svg,
+.detail-panel .detail-delete-button svg {
+  display: block;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  margin: 0;
+  transform: none;
+}
 .today-page .task-list { min-height: 244px; }
 @media (max-height: 740px) {
   .today-page .task-list { min-height: 236px; }
