@@ -38,7 +38,7 @@ function MainApp() {
   const [toast, setToast] = useState('')
   const [phasePrompt, setPhasePrompt] = useState<'break' | 'focus' | 'stopwatch-goal'>()
   const stopwatchReminderShown = useRef(new Set<string>())
-  const [confirmDialog, setConfirmDialog] = useState<{ title: string; message: string; confirmLabel?: string; onConfirm: () => void }>()
+  const [confirmDialog, setConfirmDialog] = useState<{ title: string; message: string; confirmLabel?: string; cancelLabel?: string; onConfirm: () => void }>()
   const [widgetReady, setWidgetReady] = useState(0)
   const widgetCreationPending = useRef(false)
   useEffect(() => saveState(state), [state])
@@ -56,10 +56,6 @@ function MainApp() {
     return () => media.removeEventListener?.('change', applyTheme)
   }, [state.settings.theme])
   useEffect(() => { if (toast) { const timer = window.setTimeout(() => setToast(''), 2200); return () => clearTimeout(timer) } }, [toast])
-  useEffect(() => {
-    document.body.dataset.dialogMode = confirmDialog?.title === '加入今天的任务？' ? 'today-add' : ''
-    return () => { delete document.body.dataset.dialogMode }
-  }, [confirmDialog])
   useEffect(() => {
     if (!helpOpen) return
     const closeOnEscape = (event: KeyboardEvent) => { if (event.key === 'Escape') setHelpOpen(false) }
@@ -215,7 +211,7 @@ function MainApp() {
     const task: Task = { id: createId('task'), title: draft.title, description: '', projectId: draft.projectId, priority: draft.priority, recurrence: draft.recurrence, status: 'todo', plannedMs: draft.plannedMinutes * 60000, sortOrder: state.tasks.length, createdAt: iso, updatedAt: iso, todayAddedOn: addedToToday ? dayKey : undefined, todayDismissedOn: addedToToday ? undefined : dayKey }
     update((current) => ({ ...current, tasks: [...current.tasks, task] }))
     setSelectedTaskId(task.id); setModal(null); setDuplicateCandidate(undefined); notify('任务已创建')
-    if (view === 'tasks' && draft.recurrence === 'none') setConfirmDialog({ title: '加入今天的任务？', message: '这个普通任务已创建。是否将它加入今天的任务列表？', confirmLabel: '是', onConfirm: () => { addToToday(task.id); notify('任务已加入今天') } })
+    if (view === 'tasks' && draft.recurrence === 'none') setConfirmDialog({ title: '加入今天的任务？', message: '这个普通任务已创建。是否将它加入今天的任务列表？', cancelLabel: '否', confirmLabel: '是', onConfirm: () => { addToToday(task.id); notify('任务已加入今天') } })
   }
   function reuseDuplicate(asRecurring: boolean) {
     if (!duplicateCandidate) return
