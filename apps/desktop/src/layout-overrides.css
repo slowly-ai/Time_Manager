@@ -2815,7 +2815,7 @@ body {
 .project-menu button {
   display: inline-flex;
   align-items: center;
-  line-height: 1;
+  line-height: 14px;
 }
 .bulk-actions .danger-button svg,
 .project-menu .project-menu-danger svg {
@@ -3067,7 +3067,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  line-height: 1;
+  line-height: 14px;
 }
 
 .today-task-action-delete .danger-button svg {
