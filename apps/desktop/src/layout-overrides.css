@@ -2957,6 +2957,7 @@ body {
 
 /* The creation prompt uses explicit 是/否 actions while other confirmations keep 取消. */
 body[data-dialog-mode="today-add"] .modal-actions .secondary-button {
+  position: relative;
   display: inline-flex;
   width: 56px;
   height: 42px;
@@ -2970,10 +2971,14 @@ body[data-dialog-mode="today-add"] .modal-actions .secondary-button {
 
 body[data-dialog-mode="today-add"] .modal-actions .secondary-button::after {
   content: '否';
-  display: block;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
   font-size: 13px;
   line-height: 1;
   text-align: center;
+  pointer-events: none;
 }
 
 .detail-title-content {
