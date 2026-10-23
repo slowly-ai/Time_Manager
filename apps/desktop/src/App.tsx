@@ -486,7 +486,7 @@ function StatsView({ sessions, tasks, projects, dailyGoalMs, taskCompletions }: 
   const changePeriod = (next: 'month' | 'year') => { setPeriod(next); setSelectedBucketKey(undefined) }
   const completedTaskRows = [
     ...tasks.filter((task) => task.recurrence === 'none' && task.completedAt).map((task) => ({ task, day: todayKey(new Date(task.completedAt as string).getTime()), completedAt: task.completedAt as string, recurring: false })),
-    ...taskCompletions.filter((completion) => taskIds.has(completion.taskId) && completion.status === 'completed' && completion.completedAt).map((completion) => { const task = tasks.find((item) => item.id === completion.taskId); return { task, day: completion.day, completedAt: completion.completedAt as string, recurring: task?.recurrence === 'daily' } }),
+    ...taskCompletions.filter((completion) => taskIds.has(completion.taskId) && completion.status === 'completed' && completion.completedAt).map((completion) => { const task = tasks.find((item) => item.id === completion.taskId); return { task, day: completion.day, completedAt: completion.completedAt as string, recurring: task?.recurrence === 'daily' } }).filter((row) => row.recurring),
   ].filter((row) => row.day.startsWith(period === 'month' ? `${year}-${String(month + 1).padStart(2, '0')}` : `${year}-`)).sort((a, b) => b.completedAt.localeCompare(a.completedAt))
   const selectedBucket = buckets.find((bucket) => bucket.key === selectedBucketKey)
   const visibleCompletedTaskRows = selectedBucketKey
