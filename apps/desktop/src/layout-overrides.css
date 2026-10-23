@@ -2958,6 +2958,10 @@ body {
 /* The creation prompt uses explicit 是/否 actions while other confirmations keep 取消. */
 body[data-dialog-mode="today-add"] .modal-actions .secondary-button {
   display: inline-flex;
+  width: 56px;
+  height: 42px;
+  min-height: 42px;
+  padding: 0;
   align-items: center;
   justify-content: center;
   font-size: 0;
@@ -2969,6 +2973,7 @@ body[data-dialog-mode="today-add"] .modal-actions .secondary-button::after {
   display: block;
   font-size: 13px;
   line-height: 1;
+  text-align: center;
 }
 
 .detail-title-content {
