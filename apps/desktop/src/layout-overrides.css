@@ -2851,9 +2851,15 @@ body {
 .bulk-actions .danger-button,
 .project-menu .project-menu-danger,
 .detail-panel .detail-delete-button {
+  box-sizing: border-box;
   display: inline-flex;
+  width: 132px;
+  height: 42px;
+  min-height: 42px;
+  padding: 0 12px;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   line-height: 14px;
 }
 
@@ -2867,6 +2873,13 @@ body {
   flex: 0 0 14px;
   margin: 0;
   transform: none;
+}
+
+.detail-panel .detail-delete-button > span {
+  display: block;
+  height: 14px;
+  line-height: 14px;
+  white-space: nowrap;
 }
 .today-page .task-list { min-height: 244px; }
 @media (max-height: 740px) {
