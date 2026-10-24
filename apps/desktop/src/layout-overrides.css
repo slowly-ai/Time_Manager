@@ -1577,6 +1577,9 @@ body {
 .phase-prompt { display: flex; flex-direction: column; gap: 10px; color: var(--muted); }
 .phase-prompt strong { color: var(--text); font-size: 16px; }
 .phase-prompt span { font-size: 13px; }
+.update-prompt { display: flex; flex-direction: column; gap: 8px; padding: 4px 0; }
+.update-prompt strong { color: var(--text); font-size: 15px; }
+.update-prompt span { color: var(--muted); font-size: 13px; line-height: 1.5; white-space: pre-wrap; }
 .focus-orphan-note { flex: 1; color: var(--muted); font-size: 12px; }
 .history-toolbar { display: flex; align-items: center; justify-content: space-between; min-height: 48px; padding: 0 18px; border-bottom: 1px solid var(--line); color: var(--muted); }
 .history-toolbar > div { display: flex; align-items: center; gap: 10px; }

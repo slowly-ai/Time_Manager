@@ -60,7 +60,31 @@ apps/desktop/src-tauri/target/release/bundle/nsis/
 apps/desktop/src-tauri/target/release/bundle/msi/
 ```
 
-优先分发 `nsis` 目录中的 `.exe` 安装程序。用户安装一次后，可以直接从 Windows 开始菜单启动应用；升级时再安装新版本即可。
+优先分发 `nsis` 目录中的 `.exe` 安装程序。用户安装一次后，可以直接从 Windows 开始菜单启动应用。
+
+## 应用自动更新
+
+桌面版已接入 Tauri 更新插件。更新包和 `latest.json` 发布在 GitHub Releases，不需要单独购买服务器。应用启动时会检查新版本，用户可以选择稍后更新或立即下载并安装。
+
+发布新版本前需要同步修改以下版本号：
+
+- `apps/desktop/src-tauri/tauri.conf.json`
+- `apps/desktop/src-tauri/Cargo.toml`
+- `apps/desktop/package.json`
+
+然后创建并推送版本标签，例如：
+
+```powershell
+git tag v0.1.1
+git push origin v0.1.1
+```
+
+`.github/workflows/release.yml` 会在 Windows runner 上构建 NSIS 安装包、生成签名更新产物并创建 GitHub Release。仓库需要配置以下 Actions Secrets：
+
+- `TAURI_SIGNING_PRIVATE_KEY`：本机签名私钥文件的完整内容。
+- `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`：生成私钥时设置的密码；本项目当前生成的密钥无密码，留空即可。
+
+公钥已经写入 Tauri 配置，私钥不要提交到 Git。当前已经安装的旧版本如果没有包含更新插件，不能自动发现更新；需要先手动安装一个启用自动更新的版本。
 
 Windows 10 1803 及以上和 Windows 11 通常已经包含 WebView2；如果构建或运行时提示缺失，需要安装 Microsoft Edge WebView2 Runtime。
 
