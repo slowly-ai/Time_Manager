@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { BarChart3, Check, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, Clock3, Download, FolderKanban, History, LayoutDashboard, Monitor, Moon, MoreHorizontal, Pause, Pencil, Play, Plus, Settings, Sun, Target, Trash2, Trophy, X } from 'lucide-react'
+import { BarChart3, Check, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, Clock3, Download, FolderKanban, History, LayoutDashboard, Monitor, Moon, MoreHorizontal, Pause, Pencil, Play, Plus, RefreshCw, Settings, Sun, Target, Trash2, Trophy, X } from 'lucide-react'
 import { emit, emitTo, listen } from '@tauri-apps/api/event'
 import { WebviewWindow } from '@tauri-apps/api/webviewWindow'
 import { LogicalPosition, LogicalSize } from '@tauri-apps/api/dpi'
@@ -10,6 +10,7 @@ import { addTaskToToday, createId, formatDuration, isFocusSession, isRecordableS
 
 type View = 'today' | 'tasks' | 'projects' | 'history' | 'stats' | 'settings'
 type SettingsSection = 'preferences' | 'appearance' | 'data'
+type UpdateCheckStatus = 'idle' | 'checking' | 'latest' | 'error'
 const colors = ['#334155', '#52677f', '#71869b', '#7c849e', '#668b8b']
 const priorityNames: Record<Priority, string> = { high: '高', medium: '中', low: '低' }
 type TimerWidgetSession = { timerId: string; taskId: string; taskTitle: string; elapsedMs: number; status: 'running' | 'paused'; phase: PomodoroPhase }
@@ -525,7 +526,39 @@ function SettingsView({ settings, onChange, onExport }: { settings: ChronoState[
     { value: 'dark', label: '深色', icon: Moon },
     { value: 'system', label: '跟随系统', icon: Monitor },
   ]
+  const isDataSection = () => section === 'data'
+  if (isDataSection()) return <div className="page"><div className="page-heading compact"><div><span className="eyebrow">ChronoDesk / 偏好</span><h1>设置</h1><p>让计时方式适应你的工作节奏。</p></div></div><div className="settings-layout"><nav className="settings-menu"><button className={section === 'preferences' ? 'active' : ''} onClick={() => setSection('preferences')}><Settings size={15} />计时与偏好</button><button className={section === 'appearance' ? 'active' : ''} onClick={() => setSection('appearance')}><Sun size={15} />外观</button><button className={section === 'data' ? 'active' : ''} onClick={() => setSection('data')}><Download size={15} />数据管理</button></nav><section className="settings-content settings-content-data"><SettingSection title="数据管理" description="数据保存在本机，可随时导出"><SettingRow label="导出本地数据" description="包含任务、项目、会话和设置"><button className="secondary-button" onClick={onExport}><Download size={14} />导出 JSON</button></SettingRow><UpdateCheckRow /></SettingSection></section></div></div>
   return <div className="page"><div className="page-heading compact"><div><span className="eyebrow">ChronoDesk / 偏好</span><h1>设置</h1><p>让计时方式适应你的工作节奏。</p></div></div><div className="settings-layout"><nav className="settings-menu"><button className={section === 'preferences' ? 'active' : ''} onClick={() => setSection('preferences')}><Settings size={15} />计时与偏好</button><button className={section === 'appearance' ? 'active' : ''} onClick={() => setSection('appearance')}><Sun size={15} />外观</button><button className={section === 'data' ? 'active' : ''} onClick={() => setSection('data')}><Download size={15} />数据管理</button></nav><section className={`settings-content settings-content-${section}`}><SettingSection section="appearance" title="外观" description="选择适合当前环境的显示方式"><SettingRow label="主题" description="跟随系统时会响应 Windows 的主题变化"><div className="segmented theme-segmented">{themes.map(({ value, label, icon: Icon }) => <button className={settings.theme === value ? 'active' : ''} key={value} onClick={() => onChange({ ...settings, theme: value })}><Icon size={14} />{label}</button>)}</div></SettingRow></SettingSection><div className="settings-section settings-section-preferences"><SettingSection title="正计时" description="达到默认专注目标时提醒；计时继续累计，手动结束后开始休息"><SettingRow label="默认专注时长" description="正计时达到此时长时提示你休息"><NumberField value={settings.stopwatchFocusMinutes} suffix="分钟" onChange={(value) => onChange({ ...settings, stopwatchFocusMinutes: value })} /></SettingRow><SettingRow label="休息时长" description="结束正计时专注后进入的休息阶段"><NumberField value={settings.stopwatchBreakMinutes} suffix="分钟" onChange={(value) => onChange({ ...settings, stopwatchBreakMinutes: value })} /></SettingRow></SettingSection><SettingSection title="番茄钟" description="专注和休息按设定阶段自动切换"><SettingRow label="单轮专注时长" description="番茄钟的单个专注阶段"><NumberField value={settings.focusMinutes} suffix="分钟" onChange={(value) => onChange({ ...settings, focusMinutes: value })} /></SettingRow><SettingRow label="休息时长" description="短休息和长休息"><div className="inline-fields"><NumberField value={settings.shortBreakMinutes} suffix="短休息" onChange={(value) => onChange({ ...settings, shortBreakMinutes: value })} /><NumberField value={settings.longBreakMinutes} suffix="长休息" onChange={(value) => onChange({ ...settings, longBreakMinutes: value })} /></div></SettingRow><SettingRow label="长休息间隔" description="完成几轮专注后进入长休息"><NumberField value={settings.longBreakEvery} suffix="轮专注" onChange={(value) => onChange({ ...settings, longBreakEvery: Math.max(1, Math.round(value)) })} /></SettingRow></SettingSection><SettingSection title="阶段结束提醒" description="开启后阶段结束时暂停并提醒；关闭后番茄钟及休息阶段自动继续"><label className="switch-control"><input type="checkbox" checked={settings.phaseEndReminderEnabled} onChange={(event) => onChange({ ...settings, phaseEndReminderEnabled: event.target.checked })} /><span>{settings.phaseEndReminderEnabled ? '开启' : '关闭'}</span></label></SettingSection><SettingSection title="每日目标" description="用于今日进度和目标完成度"><SettingRow label="每日专注目标" description="根据你的实际工作时间设定"><NumberField value={Math.round(settings.dailyGoalMs / 3600000)} suffix="小时" onChange={(value) => onChange({ ...settings, dailyGoalMs: value * 3600000 })} /></SettingRow></SettingSection></div><div className="settings-section settings-section-data"><SettingSection title="数据管理" description="数据保存在本机，可随时导出"><SettingRow label="导出本地数据" description="包含任务、项目、会话和设置"><button className="secondary-button" onClick={onExport}><Download size={14} />导出 JSON</button></SettingRow></SettingSection></div></section></div></div>
+}
+function UpdateCheckRow() {
+  const [status, setStatus] = useState<UpdateCheckStatus>('idle')
+  const [update, setUpdate] = useState<Update | null>(null)
+  const [installing, setInstalling] = useState(false)
+  const checkForUpdate = async () => {
+    if (!isTauriRuntime()) { setStatus('error'); return }
+    setStatus('checking')
+    try {
+      const found = await check({ timeout: 10000 })
+      if (found) { setStatus('idle'); setUpdate(found) }
+      else setStatus('latest')
+    } catch {
+      setStatus('error')
+    }
+  }
+  const closeUpdate = () => { void update?.close(); setUpdate(null) }
+  const installUpdate = async () => {
+    if (!update || installing) return
+    setInstalling(true)
+    try {
+      await update.downloadAndInstall()
+      await relaunch()
+    } catch {
+      setInstalling(false)
+      setStatus('error')
+      closeUpdate()
+    }
+  }
+  return <><SettingRow label="检查应用更新" description={status === 'checking' ? '正在连接更新服务…' : status === 'latest' ? '当前已是最新版本' : status === 'error' ? '检查失败，请确认网络或 GitHub Release 后重试' : '手动检查 GitHub Releases 中是否有新版本'}><button className="secondary-button" disabled={status === 'checking'} onClick={() => { void checkForUpdate() }}><RefreshCw size={14} />{status === 'checking' ? '检查中' : '检查更新'}</button></SettingRow>{update && <Modal title="发现新版本" eyebrow="应用更新" onClose={installing ? () => undefined : closeUpdate}><div className="update-prompt"><strong>ChronoDesk {update.version} 已发布</strong><span>{update.body || '本次更新包含功能改进和问题修复。'}</span></div><div className="modal-actions"><button className="secondary-button" disabled={installing} onClick={closeUpdate}>稍后</button><button className="primary-button" disabled={installing} onClick={() => { void installUpdate() }}>{installing ? '正在更新' : '立即更新'}</button></div></Modal>}</>
 }
 function SettingSection({ section, title, description, children }: { section?: SettingsSection; title: string; description: string; children: React.ReactNode }) { return <section className={`setting-section ${section ? `setting-section-${section}` : ''}`}><div className="setting-heading"><h2>{title}</h2><span>{description}</span></div>{children}</section> }
 function SettingRow({ label, description, children }: { label: string; description: string; children: React.ReactNode }) { return <div className="setting-row"><div><strong>{label}</strong><span>{description}</span></div><div className="setting-control">{children}</div></div> }
