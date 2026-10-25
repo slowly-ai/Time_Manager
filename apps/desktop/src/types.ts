@@ -1,3 +1,5 @@
+import { invoke } from '@tauri-apps/api/core'
+
 export type TaskStatus = 'todo' | 'running' | 'done'
 export type TaskRecurrence = 'none' | 'daily'
 export type Priority = 'low' | 'medium' | 'high'
@@ -77,6 +79,7 @@ export interface ChronoState {
 }
 
 const STORAGE_KEY = 'chronodesk-store-v2'
+const BACKUP_STORAGE_KEY = `${STORAGE_KEY}-backup`
 
 export const defaultSettings: Settings = {
   theme: 'light', defaultMode: 'stopwatch', stopwatchFocusMinutes: 45, stopwatchBreakMinutes: 10,
@@ -86,37 +89,72 @@ export const defaultSettings: Settings = {
 
 export const defaultState: ChronoState = { projects: [], tasks: [], sessions: [], taskCompletions: [], settings: defaultSettings }
 
-export function loadState(): ChronoState {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null')
-    if (!parsed) return defaultState
-    const hydrated: ChronoState = {
-      ...defaultState,
-      ...parsed,
-      tasks: Array.isArray(parsed.tasks) ? parsed.tasks.map((task: Partial<Task>) => ({ recurrence: 'none' as TaskRecurrence, ...task })) : [],
-      sessions: Array.isArray(parsed.sessions) ? parsed.sessions : [],
-      taskCompletions: Array.isArray(parsed.taskCompletions)
-        ? parsed.taskCompletions.filter((completion: Partial<TaskCompletion>) => Boolean(completion.id && completion.taskId && completion.day)).map((completion: Partial<TaskCompletion>) => ({
-          ...completion,
-          status: completion.status ?? 'completed',
-          updatedAt: completion.updatedAt ?? completion.completedAt ?? new Date().toISOString(),
-        } as TaskCompletion))
-        : [],
-      projects: Array.isArray(parsed.projects) ? parsed.projects : [],
-      settings: {
-        ...defaultSettings,
-        ...parsed.settings,
-        stopwatchFocusMinutes: parsed.settings?.stopwatchFocusMinutes ?? 45,
-        stopwatchBreakMinutes: parsed.settings?.stopwatchBreakMinutes ?? 10,
-        longBreakEvery: parsed.settings?.longBreakEvery ?? 2,
-        phaseEndReminderEnabled: parsed.settings?.phaseEndReminderEnabled ?? true,
-      },
-    }
-    return rolloverRecurringTasks(mergeDuplicateTasks(hydrated))
-  } catch { return defaultState }
+function isTauriRuntime() {
+  return typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window
 }
 
-export function saveState(state: ChronoState) { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)) }
+function hydrateState(value: unknown): ChronoState {
+  if (!value || typeof value !== 'object') throw new Error('无效的数据结构')
+  const parsed = value as Partial<ChronoState>
+  if (!Array.isArray(parsed.projects) || !Array.isArray(parsed.tasks) || !Array.isArray(parsed.sessions) || !parsed.settings || typeof parsed.settings !== 'object') {
+    throw new Error('数据结构不完整')
+  }
+  const hydrated: ChronoState = {
+    ...defaultState,
+    ...parsed,
+    tasks: parsed.tasks.map((task: Partial<Task>) => ({ recurrence: 'none' as TaskRecurrence, ...task })) as Task[],
+    sessions: parsed.sessions,
+    taskCompletions: Array.isArray(parsed.taskCompletions)
+      ? parsed.taskCompletions.filter((completion: Partial<TaskCompletion>) => Boolean(completion.id && completion.taskId && completion.day)).map((completion: Partial<TaskCompletion>) => ({
+        ...completion,
+        status: completion.status ?? 'completed',
+        updatedAt: completion.updatedAt ?? completion.completedAt ?? new Date().toISOString(),
+      } as TaskCompletion))
+      : [],
+    projects: parsed.projects,
+    settings: {
+      ...defaultSettings,
+      ...parsed.settings,
+      stopwatchFocusMinutes: parsed.settings?.stopwatchFocusMinutes ?? 45,
+      stopwatchBreakMinutes: parsed.settings?.stopwatchBreakMinutes ?? 10,
+      longBreakEvery: parsed.settings?.longBreakEvery ?? 2,
+      phaseEndReminderEnabled: parsed.settings?.phaseEndReminderEnabled ?? true,
+    },
+  }
+  return rolloverRecurringTasks(mergeDuplicateTasks(hydrated))
+}
+
+function readBrowserState(): string | null {
+  return localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(BACKUP_STORAGE_KEY)
+}
+
+export async function loadState(): Promise<ChronoState> {
+  if (isTauriRuntime()) {
+    const persisted = await invoke<string | null>('load_state')
+    if (persisted) return hydrateState(JSON.parse(persisted))
+
+    // Migrate existing installs from localStorage once, then use the file-backed store.
+    const legacy = readBrowserState()
+    if (!legacy) return defaultState
+    const migrated = hydrateState(JSON.parse(legacy))
+    await invoke('save_state', { state: JSON.stringify(migrated) })
+    return migrated
+  }
+
+  const persisted = readBrowserState()
+  return persisted ? hydrateState(JSON.parse(persisted)) : defaultState
+}
+
+export async function saveState(state: ChronoState) {
+  const serialized = JSON.stringify(state)
+  if (isTauriRuntime()) {
+    await invoke('save_state', { state: serialized })
+    return
+  }
+  const previous = localStorage.getItem(STORAGE_KEY)
+  if (previous) localStorage.setItem(BACKUP_STORAGE_KEY, previous)
+  localStorage.setItem(STORAGE_KEY, serialized)
+}
 
 export function createId(prefix: string) { return `${prefix}-${crypto.randomUUID?.() ?? Math.random().toString(36).slice(2)}` }
 

@@ -30,7 +30,7 @@ jobs:
           tauriScript: npm exec tauri --
           tagName: ${{ github.ref_name }}
           releaseName: ChronoDesk ${{ github.ref_name }}
-          releaseBody: See the release assets to install this version.
+          releaseBody: 解决了更新后数据丢失的问题。
           releaseDraft: false
           prerelease: false
           uploadUpdaterJson: true
