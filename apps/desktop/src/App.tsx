@@ -124,7 +124,7 @@ function MainApp() {
   const activeSessions = state.sessions.filter((session) => session.status === 'running' || session.status === 'paused')
   const preferredActiveTaskId = view === 'today' ? todaySelectedTaskId : selectedTaskId
   const selectedSession = preferredActiveTaskId ? activeSessions.find((session) => session.taskId === preferredActiveTaskId) : undefined
-  const active = selectedSession ?? (!preferredActiveTaskId ? activeSessions.find((session) => session.id === activeTimerId) ?? activeSessions[0] : undefined)
+  const active = selectedSession ?? activeSessions.find((session) => session.id === activeTimerId) ?? activeSessions[0]
   const backgroundActive = activeSessions.find((session) => session.id === activeTimerId) ?? activeSessions[0]
   const activeTask = state.tasks.find((task) => task.id === active?.taskId) ?? state.tasks.find((task) => task.id === preferredActiveTaskId)
   const todayStart = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime() }, [now])
@@ -159,36 +159,40 @@ function MainApp() {
     setActiveTimerId(session.id)
     setSelectedTaskId(taskId); setTodaySelectedTaskId(taskId); notify(requestedMode === 'pomodoro' ? '番茄钟已开始' : '计时已开始')
   }
-  function pauseTimer(timerId = active?.id ?? activeTimerId ?? activeSessions[0]?.id) {
-    const target = activeSessions.find((session) => session.id === timerId)
+  function pauseTimer(timerId?: string) {
+    const targetId = typeof timerId === 'string' ? timerId : active?.id ?? activeTimerId ?? activeSessions[0]?.id
+    const target = activeSessions.find((session) => session.id === targetId)
     if (!target || target.status !== 'running') return notify('当前没有可暂停的运行中计时')
     const timestamp = Date.now()
     update((current) => transitionActiveSession(current, target, [{ ...target, accumulatedMs: sessionElapsed(target, timestamp), pausedAt: new Date(timestamp).toISOString(), status: 'paused' }]))
     setActiveTimerId(target.id); notify('计时已暂停')
   }
-  function resumeTimer(timerId = active?.id ?? activeTimerId ?? activeSessions[0]?.id) {
-    const target = activeSessions.find((session) => session.id === timerId)
+  function resumeTimer(timerId?: string) {
+    const targetId = typeof timerId === 'string' ? timerId : active?.id ?? activeTimerId ?? activeSessions[0]?.id
+    const target = activeSessions.find((session) => session.id === targetId)
     if (!target || target.status !== 'paused') return
     const iso = new Date().toISOString()
     update((current) => transitionActiveSession(current, target, [{ ...target, startedAt: iso, pausedAt: undefined, status: 'running' }]))
     setActiveTimerId(target.id); notify('计时已继续')
   }
-  function finishTimer(cancelled = false, timerId = active?.id ?? activeTimerId ?? activeSessions[0]?.id) {
-    const target = activeSessions.find((session) => session.id === timerId)
+  function finishTimer(cancelled: unknown = false, timerId?: string) {
+    const targetId = typeof timerId === 'string' ? timerId : active?.id ?? activeTimerId ?? activeSessions[0]?.id
+    const target = activeSessions.find((session) => session.id === targetId)
     if (!target) return
-    const active = target
+    const targetSession = target
     const timestamp = Date.now()
-    const elapsed = sessionElapsed(active, timestamp)
+    const elapsed = sessionElapsed(targetSession, timestamp)
     const iso = new Date(timestamp).toISOString()
-    const ended = { ...active, accumulatedMs: elapsed, endedAt: iso, status: cancelled ? 'cancelled' as const : 'completed' as const }
-    const recordable = isRecordableSession(active, timestamp)
+    const wasCancelled = typeof cancelled === 'boolean' && cancelled
+    const ended = { ...targetSession, accumulatedMs: elapsed, endedAt: iso, status: wasCancelled ? 'cancelled' as const : 'completed' as const }
+    const recordable = isRecordableSession(targetSession, timestamp)
     update((current) => {
-      const next = transitionActiveSession(current, active, recordable ? [ended] : [])
-      return next === current ? current : { ...next, tasks: current.tasks.map((task) => task.id === active.taskId ? { ...task, status: 'todo' as const, updatedAt: iso } : task) }
+      const next = transitionActiveSession(current, targetSession, recordable ? [ended] : [])
+      return next === current ? current : { ...next, tasks: current.tasks.map((task) => task.id === targetSession.taskId ? { ...task, status: 'todo' as const, updatedAt: iso } : task) }
     })
     setActiveTimerId(undefined)
     setPhasePrompt(undefined)
-    notify(recordable ? (cancelled ? '会话已取消，实际时长已保留' : '会话已保存') : '未满 1 分钟，本次会话未记录')
+    notify(recordable ? (wasCancelled ? '会话已取消，实际时长已保留' : '会话已保存') : '未满 1 分钟，本次会话未记录')
   }
   useEffect(() => {
     if (!isTauriRuntime()) return
