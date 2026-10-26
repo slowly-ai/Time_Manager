@@ -1,98 +1,75 @@
-# ChronoDesk
+# ChronoDesk 使用教程
 
-ChronoDesk 是一个 Windows 优先的本地优先任务计时与个人效率工作台。当前仓库包含：
+ChronoDesk 是一款 Windows 桌面专注计时工具，支持任务管理、正计时、番茄钟、历史记录和数据统计。
 
-- `apps/desktop`：React + Vite 桌面界面，支持任务、项目、正计时、番茄钟、历史记录、统计和设置。
-- `apps/api`：云端 API 骨架，提供健康检查和同步接口入口。
-- `packages/domain`：计时状态机与时间计算规则。
-- `packages/contracts`：跨端共享的同步类型。
+## 下载安装
 
-## 开发
+1. 从 [GitHub Releases](https://github.com/slowly-ai/Time_Manager/releases) 下载最新的 `ChronoDesk_*_x64-setup.exe`。
+2. 双击安装包，选择安装目录并完成安装。
+3. 从桌面快捷方式或 Windows 开始菜单打开 ChronoDesk。
 
-```bash
-npm install
-npm run dev
-```
+更新时会沿用已有的安装目录，不会把应用改装到其他目录。安装和更新过程中不会删除任务或专注记录。
 
-当前核心数据保存在本地应用存储中，支持 JSON 导出。联网不是启动应用的前置条件；联网只用于后续接入云端同步。
+## 开始一次专注
 
-`npm run dev` 仅用于浏览器开发预览，`npm run desktop:dev` 仅用于桌面开发调试。普通用户应安装构建出的 Windows 安装包，之后从开始菜单或桌面快捷方式直接打开 `ChronoDesk`，无需 Node.js、终端命令或网络连接。
+1. 在“今日工作台”点击“新建任务”，填写任务名称并保存。
+2. 在任务列表中选中任务。
+3. 在右侧“当前专注”选择计时方式。
+4. 点击“开始专注”。
 
-## Windows 桌面运行与打包
+## 正计时
 
-项目使用 Tauri 2。需要先安装：
+正计时会按照实际经过的时间累计，不会自动结束。
 
-1. Visual Studio Community 或 Build Tools，勾选 `Desktop development with C++` 和 Windows SDK。
-2. Rust MSVC 工具链：
+默认专注提醒为 45 分钟。达到设定时间后：
 
-```powershell
-$rustupHome = 'G:\开发工具\Rustup'
-$cargoHome = 'G:\开发工具\Cargo'
-[Environment]::SetEnvironmentVariable('RUSTUP_HOME', $rustupHome, 'User')
-[Environment]::SetEnvironmentVariable('CARGO_HOME', $cargoHome, 'User')
-$env:RUSTUP_HOME = $rustupHome
-$env:CARGO_HOME = $cargoHome
-Invoke-WebRequest 'https://win.rustup.rs/x86_64' -OutFile 'G:\开发工具\rustup-init.exe'
-& 'G:\开发工具\rustup-init.exe' -y --default-toolchain stable-msvc --profile minimal
-```
+- 主窗口会弹出提醒；
+- 右下角悬浮计时器也会显示提醒，即使主窗口最小化也能看到；
+- 点击“休息”会保存当前专注并开始休息计时；
+- 点击“继续正计时”会继续当前计时，并且本次不重复提醒。
 
-如果官方源连接不稳定，可以在安装前使用 Rust 镜像：
+提醒时间可以在“设置 → 计时与偏好 → 正计时 → 默认专注时长”中修改。
 
-```powershell
-[Environment]::SetEnvironmentVariable('RUSTUP_DIST_SERVER', 'https://rsproxy.cn', 'User')
-[Environment]::SetEnvironmentVariable('RUSTUP_UPDATE_ROOT', 'https://rsproxy.cn/rustup', 'User')
-```
+## 番茄钟
 
-安装后重新打开终端，确认 `rustc --version` 和 `cargo --version` 可用。
+番茄钟按阶段计时。默认设置为：
 
-```powershell
-npm install
-npm run desktop:dev
-npm run desktop:build
-```
+- 专注 25 分钟；
+- 短休息 5 分钟；
+- 每完成 2 轮专注后长休息 10 分钟。
 
-`desktop:build` 会生成包含 WebView2 离线运行时的安装包。安装包首次安装不依赖网络，但体积会比在线引导安装器更大。
+可以在“设置 → 计时与偏好 → 番茄钟”中修改专注时长、休息时长和长休息间隔。
 
-开发模式会打开桌面窗口。打包完成后，安装包位于：
+## 阶段结束提醒
 
-```text
-apps/desktop/src-tauri/target/release/bundle/nsis/
-apps/desktop/src-tauri/target/release/bundle/msi/
-```
+在“设置 → 计时与偏好 → 阶段结束提醒”中：
 
-优先分发 `nsis` 目录中的 `.exe` 安装程序。用户安装一次后，可以直接从 Windows 开始菜单启动应用。
+- **开启**：正计时和番茄钟到达阶段时间后弹窗提醒，并在悬浮计时器中显示提醒；
+- **关闭**：不弹出阶段结束提醒，番茄钟会自动进入下一阶段。
 
-## 应用自动更新
+## 暂停、继续和保存
 
-桌面版已接入 Tauri 更新插件。更新包和 `latest.json` 发布在 GitHub Releases，不需要单独购买服务器。应用启动时会检查新版本，用户可以选择稍后更新或立即下载并安装。
+- 点击“暂停”可以暂时停止计时；
+- 点击“继续”可以恢复计时；
+- 点击“结束并保存”会保存本次专注记录；
+- 右下角悬浮计时器也支持暂停、继续和结束保存。
 
-发布新版本前需要同步修改以下版本号：
+## 查看记录和统计
 
-- `apps/desktop/src-tauri/tauri.conf.json`
-- `apps/desktop/src-tauri/Cargo.toml`
-- `apps/desktop/package.json`
+- “专注记录”：查看每次已保存的专注时长；
+- “数据统计”：查看每日趋势和项目投入时间；
+- “今日工作台”：查看当天累计专注时间和完成进度。
 
-然后创建并推送版本标签，例如：
+## 数据与备份
 
-```powershell
-git tag v0.1.1
-git push origin v0.1.1
-```
+任务、项目、专注记录和设置保存在本机。软件更新不会删除已有数据。
 
-`.github/workflows/release.yml` 会在 Windows runner 上构建 NSIS 安装包、生成签名更新产物并创建 GitHub Release。仓库需要配置以下 Actions Secrets：
+建议定期打开“设置 → 数据管理”，使用“导出本地数据”保存 JSON 备份。需要恢复时，使用“导入 JSON”即可。
 
-- `TAURI_SIGNING_PRIVATE_KEY`：本机签名私钥文件的完整内容。
-- `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`：生成私钥时设置的密码；本项目当前生成的密钥无密码，留空即可。
+## 自动更新
 
-公钥已经写入 Tauri 配置，私钥不要提交到 Git。当前已经安装的旧版本如果没有包含更新插件，不能自动发现更新；需要先手动安装一个启用自动更新的版本。
+应用启动时会检查 GitHub Releases 是否有新版本。发现新版本后，可以选择稍后更新或立即更新。更新会安装到当前应用所在的目录。
 
-Windows 10 1803 及以上和 Windows 11 通常已经包含 WebView2；如果构建或运行时提示缺失，需要安装 Microsoft Edge WebView2 Runtime。
+## 卸载
 
-## 页面
-
-- 今日工作台：任务清单、目标进度和当前专注。
-- 所有任务：筛选、完成、删除和历史会话。
-- 项目管理：项目颜色、任务数量和投入时间。
-- 专注记录：按会话查看真实计时结果。
-- 数据统计：最近 7 天趋势和项目分布。
-- 设置：正计时/番茄钟、休息时长、每日目标和导出。
+在 Windows“设置 → 应用 → 已安装的应用”中找到 ChronoDesk 并卸载。卸载应用不会自动删除本地数据，卸载前可以先导出 JSON 备份。
