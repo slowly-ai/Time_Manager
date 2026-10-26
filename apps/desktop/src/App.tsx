@@ -70,7 +70,6 @@ function MainApp() {
   const [updateInstalling, setUpdateInstalling] = useState(false)
   const updateCheckStarted = useRef(false)
   const [phasePrompt, setPhasePrompt] = useState<'break' | 'focus' | 'stopwatch-goal'>()
-  const stopwatchReminderShown = useRef(new Set<string>())
   const [confirmDialog, setConfirmDialog] = useState<{ title: string; message: string; confirmLabel?: string; cancelLabel?: string; onConfirm: () => void }>()
   const [widgetReady, setWidgetReady] = useState(0)
   const widgetCreationPending = useRef(false)
@@ -162,7 +161,7 @@ function MainApp() {
   }
   function pauseTimer(timerId = active?.id ?? activeTimerId ?? activeSessions[0]?.id) {
     const target = activeSessions.find((session) => session.id === timerId)
-    if (!target || target.status !== 'running') return
+    if (!target || target.status !== 'running') return notify('当前没有可暂停的运行中计时')
     const timestamp = Date.now()
     update((current) => transitionActiveSession(current, target, [{ ...target, accumulatedMs: sessionElapsed(target, timestamp), pausedAt: new Date(timestamp).toISOString(), status: 'paused' }]))
     setActiveTimerId(target.id); notify('计时已暂停')
@@ -183,16 +182,13 @@ function MainApp() {
     const iso = new Date(timestamp).toISOString()
     const ended = { ...active, accumulatedMs: elapsed, endedAt: iso, status: cancelled ? 'cancelled' as const : 'completed' as const }
     const recordable = isRecordableSession(active, timestamp)
-    const enterStopwatchBreak = !cancelled && active.mode === 'stopwatch' && active.phase === 'focus' && elapsed >= state.settings.stopwatchFocusMinutes * 60000
-    const breakSession: FocusSession | undefined = enterStopwatchBreak ? { id: createId('session'), taskId: active.taskId, projectId: active.projectId, mode: 'stopwatch', phase: 'short_break', pomodoroIndex: active.pomodoroIndex, startedAt: iso, accumulatedMs: 0, status: state.settings.phaseEndReminderEnabled ? 'paused' : 'running' } : undefined
     update((current) => {
-      const next = transitionActiveSession(current, active, [...(recordable ? [ended] : []), ...(breakSession ? [breakSession] : [])])
+      const next = transitionActiveSession(current, active, recordable ? [ended] : [])
       return next === current ? current : { ...next, tasks: current.tasks.map((task) => task.id === active.taskId ? { ...task, status: 'todo' as const, updatedAt: iso } : task) }
     })
-    setActiveTimerId(breakSession?.id)
-    if (breakSession && state.settings.phaseEndReminderEnabled) setPhasePrompt('break')
-    else if (breakSession) setPhasePrompt(undefined)
-    notify(enterStopwatchBreak ? '专注已保存，开始 10 分钟休息' : recordable ? (cancelled ? '会话已取消，实际时长已保留' : '会话已保存') : '未满 1 分钟，本次会话未记录')
+    setActiveTimerId(undefined)
+    setPhasePrompt(undefined)
+    notify(recordable ? (cancelled ? '会话已取消，实际时长已保留' : '会话已保存') : '未满 1 分钟，本次会话未记录')
   }
   useEffect(() => {
     if (!isTauriRuntime()) return
@@ -292,17 +288,10 @@ function MainApp() {
   useEffect(() => {
     if (!backgroundActive || backgroundActive.status !== 'running') return
     const elapsed = sessionElapsed(backgroundActive, now)
-    if (backgroundActive.mode === 'stopwatch' && backgroundActive.phase === 'focus') {
-      if (elapsed >= state.settings.stopwatchFocusMinutes * 60000 && !stopwatchReminderShown.current.has(backgroundActive.id)) {
-        stopwatchReminderShown.current.add(backgroundActive.id)
-        if (state.settings.phaseEndReminderEnabled) setPhasePrompt('stopwatch-goal')
-      }
-      return
-    }
+    if (backgroundActive.mode === 'stopwatch') return
     if (backgroundActive.mode === 'pomodoro' && backgroundActive.phase === 'focus' && elapsed < phaseDuration('focus', state.settings)) return
-    if (backgroundActive.mode === 'stopwatch' && backgroundActive.phase === 'short_break' && elapsed < state.settings.stopwatchBreakMinutes * 60000) return
     if (backgroundActive.mode === 'pomodoro' && backgroundActive.phase !== 'focus' && elapsed < phaseDuration(backgroundActive.phase, state.settings)) return
-    const limit = backgroundActive.mode === 'stopwatch' ? state.settings.stopwatchBreakMinutes * 60000 : phaseDuration(backgroundActive.phase, state.settings)
+    const limit = phaseDuration(backgroundActive.phase, state.settings)
     const finished = { ...backgroundActive, accumulatedMs: limit, endedAt: new Date().toISOString(), status: 'completed' as const }
     const nextPhase: PomodoroPhase = backgroundActive.phase === 'focus'
       ? (backgroundActive.mode === 'pomodoro' && backgroundActive.pomodoroIndex % Math.max(1, state.settings.longBreakEvery) === 0 ? 'long_break' : 'short_break')
@@ -540,7 +529,7 @@ function FocusPanel({ task, session, mode, setMode, settings, now, onStart, onPa
   const elapsed = session ? sessionElapsed(session, now) : 0
   const currentMode = session?.mode ?? mode
   const durationSummary = currentMode === 'stopwatch'
-    ? `默认专注 ${settings.stopwatchFocusMinutes} 分钟 · 休息 ${settings.stopwatchBreakMinutes} 分钟`
+    ? '按实际时间计时，手动暂停或结束'
     : `单轮专注 ${settings.focusMinutes} 分钟 · 短休息 ${settings.shortBreakMinutes} 分钟 · 每 ${settings.longBreakEvery} 轮长休息 ${settings.longBreakMinutes} 分钟`
   return <section className={`focus-panel ${session ? 'active' : ''}`}><div className="section-heading"><div><span className="eyebrow">当前专注</span><h2>{task?.title ?? (session ? '任务已删除' : '选择一个任务开始')}</h2></div></div>{task || session ? <div className="focus-active-content"><span className="focus-context">{session ? (session.phase === 'short_break' ? '短休息' : session.phase === 'long_break' ? '长休息' : '专注阶段') : '准备开始'} · {currentMode === 'pomodoro' ? '番茄钟' : '正计时'}</span><label className="timer-mode-select"><span>计时方式</span><select aria-label="计时方式" value={currentMode} disabled={Boolean(session)} onChange={(event) => setMode(event.target.value as TimerMode)}><option value="stopwatch">正计时</option><option value="pomodoro">番茄钟</option></select></label><div className="focus-duration-summary">{durationSummary}</div><div className="focus-active-center"><div className="big-timer">{formatDuration(elapsed)}</div><div className="focus-actions">{session?.status === 'running' ? <button className="pause-button" onClick={onPause}><Pause size={16} fill="currentColor" />暂停</button> : session?.status === 'paused' ? <button className="primary-button" onClick={onResume}><Play size={16} fill="currentColor" />继续</button> : task ? <button className="primary-button" onClick={() => onStart(task.id, mode)}><Play size={16} fill="currentColor" />开始专注</button> : <span className="focus-orphan-note">该任务已删除，可结束并保存当前计时。</span>}{session && <button className="finish-button" onClick={onFinish}><Check size={15} />结束并保存</button>}</div></div><span className="focus-hint">窗口失焦、切换页面或系统休眠不会影响计时</span></div> : <div className="focus-empty-state"><div><Clock3 size={20} /></div><strong>还没有正在进行的专注</strong><span>从左侧任务列表开始一段专注时间。</span></div>}</section>
 }

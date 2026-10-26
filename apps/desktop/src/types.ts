@@ -173,9 +173,7 @@ export function sessionElapsed(session: FocusSession, now = Date.now()) {
 /** Ignore duplicate or stale timer actions; completed history is never a timer target. */
 export function transitionActiveSession(state: ChronoState, previous: FocusSession, replacements: FocusSession[]): ChronoState {
   const current = state.sessions.find((session) => session.id === previous.id)
-  if (!current || (current.status !== 'running' && current.status !== 'paused')
-    || current.status !== previous.status || current.startedAt !== previous.startedAt
-    || current.accumulatedMs !== previous.accumulatedMs || current.phase !== previous.phase) return state
+  if (!current || (current.status !== 'running' && current.status !== 'paused')) return state
   return { ...state, sessions: [...state.sessions.filter((session) => session.id !== previous.id), ...replacements] }
 }
 

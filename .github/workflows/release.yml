@@ -30,7 +30,7 @@ jobs:
           tauriScript: npm exec tauri --
           tagName: ${{ github.ref_name }}
           releaseName: ChronoDesk ${{ github.ref_name }}
-          releaseBody: 修复连续结束专注时记录被覆盖的问题，并继续保护本地数据。
+          releaseBody: 修复暂停按钮无响应，并移除正计时的45分钟自动提醒和休息切换。
           releaseDraft: false
           prerelease: false
           uploadUpdaterJson: true
