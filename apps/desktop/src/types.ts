@@ -80,6 +80,7 @@ export interface ChronoState {
 
 const STORAGE_KEY = 'chronodesk-store-v2'
 const BACKUP_STORAGE_KEY = `${STORAGE_KEY}-backup`
+let saveQueue = Promise.resolve()
 
 export const defaultSettings: Settings = {
   theme: 'light', defaultMode: 'stopwatch', stopwatchFocusMinutes: 45, stopwatchBreakMinutes: 10,
@@ -148,12 +149,18 @@ export async function loadState(): Promise<ChronoState> {
 export async function saveState(state: ChronoState) {
   const serialized = JSON.stringify(state)
   if (isTauriRuntime()) {
-    await invoke('save_state', { state: serialized })
+    const write = saveQueue.catch(() => undefined).then(() => invoke('save_state', { state: serialized }))
+    saveQueue = write.then(() => undefined, () => undefined)
+    await write
     return
   }
-  const previous = localStorage.getItem(STORAGE_KEY)
-  if (previous) localStorage.setItem(BACKUP_STORAGE_KEY, previous)
-  localStorage.setItem(STORAGE_KEY, serialized)
+  const write = saveQueue.catch(() => undefined).then(() => {
+    const previous = localStorage.getItem(STORAGE_KEY)
+    if (previous) localStorage.setItem(BACKUP_STORAGE_KEY, previous)
+    localStorage.setItem(STORAGE_KEY, serialized)
+  })
+  saveQueue = write.then(() => undefined, () => undefined)
+  await write
 }
 
 export function createId(prefix: string) { return `${prefix}-${crypto.randomUUID?.() ?? Math.random().toString(36).slice(2)}` }
@@ -161,6 +168,15 @@ export function createId(prefix: string) { return `${prefix}-${crypto.randomUUID
 export function sessionElapsed(session: FocusSession, now = Date.now()) {
   if (session.status !== 'running') return Math.max(0, session.accumulatedMs)
   return Math.max(0, session.accumulatedMs + now - new Date(session.startedAt).getTime())
+}
+
+/** Ignore duplicate or stale timer actions; completed history is never a timer target. */
+export function transitionActiveSession(state: ChronoState, previous: FocusSession, replacements: FocusSession[]): ChronoState {
+  const current = state.sessions.find((session) => session.id === previous.id)
+  if (!current || (current.status !== 'running' && current.status !== 'paused')
+    || current.status !== previous.status || current.startedAt !== previous.startedAt
+    || current.accumulatedMs !== previous.accumulatedMs || current.phase !== previous.phase) return state
+  return { ...state, sessions: [...state.sessions.filter((session) => session.id !== previous.id), ...replacements] }
 }
 
 export function formatDuration(ms: number, includeHours = true) {

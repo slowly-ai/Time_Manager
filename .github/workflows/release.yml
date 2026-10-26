@@ -30,7 +30,7 @@ jobs:
           tauriScript: npm exec tauri --
           tagName: ${{ github.ref_name }}
           releaseName: ChronoDesk ${{ github.ref_name }}
-          releaseBody: 解决了更新后数据丢失的问题。
+          releaseBody: 修复连续结束专注时记录被覆盖的问题，并继续保护本地数据。
           releaseDraft: false
           prerelease: false
           uploadUpdaterJson: true

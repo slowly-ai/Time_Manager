@@ -1,8 +1,10 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use std::{fs, path::PathBuf};
+use std::{fs, path::PathBuf, sync::Mutex};
 
-use tauri::{AppHandle, Manager, WindowEvent};
+use tauri::{AppHandle, Manager, State, WindowEvent};
+
+struct SaveLock(Mutex<()>);
 
 fn state_paths(app: &AppHandle) -> Result<(PathBuf, PathBuf, PathBuf), String> {
     let directory = app
@@ -55,7 +57,8 @@ fn load_state(app: AppHandle) -> Result<Option<String>, String> {
 }
 
 #[tauri::command]
-fn save_state(app: AppHandle, state: String) -> Result<(), String> {
+fn save_state(app: AppHandle, state: String, save_lock: State<'_, SaveLock>) -> Result<(), String> {
+    let _guard = save_lock.0.lock().map_err(|_| "本地数据保存锁异常".to_string())?;
     if !is_valid_state_json(&state) {
         return Err("拒绝保存无效的数据格式".to_string());
     }
@@ -78,6 +81,7 @@ fn save_state(app: AppHandle, state: String) -> Result<(), String> {
 
 fn main() {
     tauri::Builder::default()
+        .manage(SaveLock(Mutex::new(())))
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_updater::Builder::new().build())

@@ -8,7 +8,7 @@ import { currentMonitor, getCurrentWindow } from '@tauri-apps/api/window'
 import { relaunch } from '@tauri-apps/plugin-process'
 import { check, type Update } from '@tauri-apps/plugin-updater'
 import desktopPackage from '../package.json'
-import { addTaskToToday, createId, defaultSettings, defaultState, formatDuration, isFocusSession, isRecordableSession, isTaskVisibleToday, loadState, normalizeTaskKey, removeTaskCompletion, rolloverRecurringTasks, saveState, sessionElapsed, setTaskCompletion, taskCompletionForDay, todayKey, tomorrowKey, type ChronoState, type FocusSession, type PomodoroPhase, type Priority, type Project, type Task, type TaskRecurrence, type TimerMode } from './types'
+import { addTaskToToday, createId, defaultSettings, defaultState, formatDuration, isFocusSession, isRecordableSession, isTaskVisibleToday, loadState, normalizeTaskKey, removeTaskCompletion, rolloverRecurringTasks, saveState, sessionElapsed, setTaskCompletion, taskCompletionForDay, todayKey, tomorrowKey, transitionActiveSession, type ChronoState, type FocusSession, type PomodoroPhase, type Priority, type Project, type Task, type TaskRecurrence, type TimerMode } from './types'
 
 type View = 'today' | 'tasks' | 'projects' | 'history' | 'stats' | 'settings'
 type SettingsSection = 'preferences' | 'appearance' | 'data'
@@ -160,19 +160,35 @@ function MainApp() {
     setActiveTimerId(session.id)
     setSelectedTaskId(taskId); setTodaySelectedTaskId(taskId); notify(requestedMode === 'pomodoro' ? '番茄钟已开始' : '计时已开始')
   }
-  function pauseTimer(timerId = active?.id ?? activeTimerId) { const target = activeSessions.find((session) => session.id === timerId) ?? activeSessions.find((session) => session.taskId === preferredActiveTaskId) ?? activeSessions[0]; if (!target || target.status !== 'running') return notify('当前没有可暂停的运行中计时'); update((current) => ({ ...current, sessions: current.sessions.map((item) => item.id === target.id ? { ...item, accumulatedMs: sessionElapsed(item, now), pausedAt: new Date().toISOString(), status: 'paused' } : item) })); setActiveTimerId(target.id); notify('计时已暂停') }
-  function resumeTimer(timerId = active?.id ?? activeTimerId) { const target = activeSessions.find((session) => session.id === timerId) ?? activeSessions.find((session) => session.taskId === preferredActiveTaskId) ?? activeSessions[0]; if (!target || target.status !== 'paused') return notify('当前没有可继续的暂停计时'); update((current) => ({ ...current, sessions: current.sessions.map((item) => item.id === target.id ? { ...item, startedAt: new Date().toISOString(), pausedAt: undefined, status: 'running' } : item) })); setActiveTimerId(target.id); notify('计时已继续') }
-  function finishTimer(cancelled = false, timerId = active?.id ?? activeTimerId ?? activeSessions[0]?.id) {
-    const target = activeSessions.find((session) => session.id === timerId) ?? activeSessions.find((session) => session.taskId === preferredActiveTaskId) ?? activeSessions[0]
-    if (!target) return notify('当前没有可结束的计时')
-    const active = target
-    const elapsed = sessionElapsed(active, now)
+  function pauseTimer(timerId = active?.id ?? activeTimerId ?? activeSessions[0]?.id) {
+    const target = activeSessions.find((session) => session.id === timerId)
+    if (!target || target.status !== 'running') return
+    const timestamp = Date.now()
+    update((current) => transitionActiveSession(current, target, [{ ...target, accumulatedMs: sessionElapsed(target, timestamp), pausedAt: new Date(timestamp).toISOString(), status: 'paused' }]))
+    setActiveTimerId(target.id); notify('计时已暂停')
+  }
+  function resumeTimer(timerId = active?.id ?? activeTimerId ?? activeSessions[0]?.id) {
+    const target = activeSessions.find((session) => session.id === timerId)
+    if (!target || target.status !== 'paused') return
     const iso = new Date().toISOString()
+    update((current) => transitionActiveSession(current, target, [{ ...target, startedAt: iso, pausedAt: undefined, status: 'running' }]))
+    setActiveTimerId(target.id); notify('计时已继续')
+  }
+  function finishTimer(cancelled = false, timerId = active?.id ?? activeTimerId ?? activeSessions[0]?.id) {
+    const target = activeSessions.find((session) => session.id === timerId)
+    if (!target) return
+    const active = target
+    const timestamp = Date.now()
+    const elapsed = sessionElapsed(active, timestamp)
+    const iso = new Date(timestamp).toISOString()
     const ended = { ...active, accumulatedMs: elapsed, endedAt: iso, status: cancelled ? 'cancelled' as const : 'completed' as const }
-    const recordable = isRecordableSession(active, now)
+    const recordable = isRecordableSession(active, timestamp)
     const enterStopwatchBreak = !cancelled && active.mode === 'stopwatch' && active.phase === 'focus' && elapsed >= state.settings.stopwatchFocusMinutes * 60000
     const breakSession: FocusSession | undefined = enterStopwatchBreak ? { id: createId('session'), taskId: active.taskId, projectId: active.projectId, mode: 'stopwatch', phase: 'short_break', pomodoroIndex: active.pomodoroIndex, startedAt: iso, accumulatedMs: 0, status: state.settings.phaseEndReminderEnabled ? 'paused' : 'running' } : undefined
-    update((current) => ({ ...current, sessions: [...current.sessions.filter((item) => item.id !== active.id), ...(recordable ? [ended] : []), ...(breakSession ? [breakSession] : [])], tasks: current.tasks.map((task) => task.id === active.taskId ? { ...task, status: 'todo' as const, updatedAt: iso } : task) }))
+    update((current) => {
+      const next = transitionActiveSession(current, active, [...(recordable ? [ended] : []), ...(breakSession ? [breakSession] : [])])
+      return next === current ? current : { ...next, tasks: current.tasks.map((task) => task.id === active.taskId ? { ...task, status: 'todo' as const, updatedAt: iso } : task) }
+    })
     setActiveTimerId(breakSession?.id)
     if (breakSession && state.settings.phaseEndReminderEnabled) setPhasePrompt('break')
     else if (breakSession) setPhasePrompt(undefined)
@@ -184,16 +200,21 @@ function MainApp() {
     void listen('timer-widget-ready', () => setWidgetReady((value) => value + 1)).then((stop) => { unlisten = stop })
     return () => unlisten?.()
   }, [])
+  const widgetActions = useRef({ pauseTimer, resumeTimer, finishTimer })
+  widgetActions.current = { pauseTimer, resumeTimer, finishTimer }
   useEffect(() => {
     if (!isTauriRuntime()) return
+    let disposed = false
     let unlisten: (() => void) | undefined
     void listen<TimerWidgetAction>('timer-widget-action', ({ payload }) => {
-      if (payload.action === 'pause') pauseTimer(payload.timerId)
-      if (payload.action === 'resume') resumeTimer(payload.timerId)
-      if (payload.action === 'finish') finishTimer(false, payload.timerId)
-    }).then((stop) => { unlisten = stop })
-    return () => unlisten?.()
-  }, [active?.id, active?.status, now, activeSessions])
+      if (disposed) return
+      const actions = widgetActions.current
+      if (payload.action === 'pause') actions.pauseTimer(payload.timerId)
+      if (payload.action === 'resume') actions.resumeTimer(payload.timerId)
+      if (payload.action === 'finish') actions.finishTimer(false, payload.timerId)
+    }).then((stop) => { if (disposed) stop(); else unlisten = stop })
+    return () => { disposed = true; unlisten?.() }
+  }, [])
   useEffect(() => {
     if (!isTauriRuntime()) return
     let unlisten: (() => void) | undefined
@@ -288,7 +309,7 @@ function MainApp() {
       : 'focus'
     const shouldPrompt = state.settings.phaseEndReminderEnabled
     const next: FocusSession = { id: createId('session'), taskId: backgroundActive.taskId, projectId: backgroundActive.projectId, mode: backgroundActive.mode, phase: nextPhase, pomodoroIndex: nextPhase === 'focus' ? backgroundActive.pomodoroIndex + 1 : backgroundActive.pomodoroIndex, startedAt: new Date().toISOString(), accumulatedMs: 0, status: shouldPrompt ? 'paused' : 'running' }
-    update((current) => ({ ...current, sessions: [...current.sessions.filter((item) => item.id !== backgroundActive.id), ...(isRecordableSession(backgroundActive, now) ? [finished] : []), next] }))
+    update((current) => transitionActiveSession(current, backgroundActive, [...(isRecordableSession(backgroundActive, now) ? [finished] : []), next]))
     if (shouldPrompt) setPhasePrompt(nextPhase === 'focus' ? 'focus' : 'break')
   }, [now])
   function createTask(draft: TaskDraft, force = false) {
@@ -454,7 +475,7 @@ function MainApp() {
   function continueFocusInsteadOfBreak() {
     if (!backgroundActive || backgroundActive.phase === 'focus') { setPhasePrompt(undefined); return }
     const next: FocusSession = { id: createId('session'), taskId: backgroundActive.taskId, projectId: backgroundActive.projectId, mode: backgroundActive.mode, phase: 'focus', pomodoroIndex: backgroundActive.pomodoroIndex + (backgroundActive.mode === 'pomodoro' ? 1 : 0), startedAt: new Date().toISOString(), accumulatedMs: 0, status: 'running' }
-    update((current) => ({ ...current, sessions: [...current.sessions.filter((session) => session.id !== backgroundActive.id), next] }))
+    update((current) => transitionActiveSession(current, backgroundActive, [next]))
     setActiveTimerId(next.id)
     setPhasePrompt(undefined); notify('已继续专注，本轮结束后仍会提醒休息')
   }
