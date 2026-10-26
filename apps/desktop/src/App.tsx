@@ -16,8 +16,9 @@ type UpdateCheckStatus = 'idle' | 'checking' | 'latest' | 'error'
 const colors = ['#334155', '#52677f', '#71869b', '#7c849e', '#668b8b']
 const priorityNames: Record<Priority, string> = { high: '高', medium: '中', low: '低' }
 type TimerWidgetSession = { timerId: string; taskId: string; taskTitle: string; elapsedMs: number; status: 'running' | 'paused'; phase: PomodoroPhase }
-type TimerWidgetPayload = { sessions: TimerWidgetSession[]; theme: 'light' | 'dark' }
-type TimerWidgetAction = { action: 'pause' | 'resume' | 'finish'; timerId: string }
+type TimerWidgetReminder = { timerId: string; taskTitle: string; minutes: number }
+type TimerWidgetPayload = { sessions: TimerWidgetSession[]; theme: 'light' | 'dark'; reminder?: TimerWidgetReminder }
+type TimerWidgetAction = { action: 'pause' | 'resume' | 'finish' | 'reminder-continue' | 'reminder-rest'; timerId: string }
 type TaskDraft = { title: string; projectId: string; priority: Priority; plannedMinutes: number; recurrence: TaskRecurrence }
 type ProjectDraft = { id?: string; name: string; color: string }
 type DuplicateCandidate = { draft: TaskDraft; existing: Task; recurringExists: boolean }
@@ -70,6 +71,8 @@ function MainApp() {
   const [updateInstalling, setUpdateInstalling] = useState(false)
   const updateCheckStarted = useRef(false)
   const [phasePrompt, setPhasePrompt] = useState<'break' | 'focus' | 'stopwatch-goal'>()
+  const [stopwatchReminder, setStopwatchReminder] = useState<TimerWidgetReminder>()
+  const stopwatchReminderShown = useRef(new Set<string>())
   const [confirmDialog, setConfirmDialog] = useState<{ title: string; message: string; confirmLabel?: string; cancelLabel?: string; onConfirm: () => void }>()
   const [widgetReady, setWidgetReady] = useState(0)
   const widgetCreationPending = useRef(false)
@@ -104,6 +107,7 @@ function MainApp() {
     return () => media.removeEventListener?.('change', applyTheme)
   }, [state.settings.theme])
   useEffect(() => { if (toast) { const timer = window.setTimeout(() => setToast(''), 2200); return () => clearTimeout(timer) } }, [toast])
+  useEffect(() => { if (!phasePrompt && stopwatchReminder) setStopwatchReminder(undefined) }, [phasePrompt, stopwatchReminder])
   useEffect(() => {
     if (!isTauriRuntime()) return
     void getVersion().then(setAppVersion).catch(() => undefined)
@@ -186,13 +190,21 @@ function MainApp() {
     const wasCancelled = typeof cancelled === 'boolean' && cancelled
     const ended = { ...targetSession, accumulatedMs: elapsed, endedAt: iso, status: wasCancelled ? 'cancelled' as const : 'completed' as const }
     const recordable = isRecordableSession(targetSession, timestamp)
+    const enterStopwatchBreak = !wasCancelled && targetSession.mode === 'stopwatch' && targetSession.phase === 'focus' && elapsed >= state.settings.stopwatchFocusMinutes * 60000
+    const breakSession: FocusSession | undefined = enterStopwatchBreak ? { id: createId('session'), taskId: targetSession.taskId, projectId: targetSession.projectId, mode: 'stopwatch', phase: 'short_break', pomodoroIndex: targetSession.pomodoroIndex, startedAt: iso, accumulatedMs: 0, status: 'running' } : undefined
     update((current) => {
-      const next = transitionActiveSession(current, targetSession, recordable ? [ended] : [])
+      const next = transitionActiveSession(current, targetSession, [...(recordable ? [ended] : []), ...(breakSession ? [breakSession] : [])])
       return next === current ? current : { ...next, tasks: current.tasks.map((task) => task.id === targetSession.taskId ? { ...task, status: 'todo' as const, updatedAt: iso } : task) }
     })
-    setActiveTimerId(undefined)
+    setActiveTimerId(breakSession?.id)
     setPhasePrompt(undefined)
-    notify(recordable ? (wasCancelled ? '会话已取消，实际时长已保留' : '会话已保存') : '未满 1 分钟，本次会话未记录')
+    setStopwatchReminder(undefined)
+    notify(enterStopwatchBreak ? '专注已保存，开始休息' : recordable ? (wasCancelled ? '会话已取消，实际时长已保留' : '会话已保存') : '未满 1 分钟，本次会话未记录')
+  }
+  function continueStopwatch() {
+    setPhasePrompt(undefined)
+    setStopwatchReminder(undefined)
+    notify('继续正计时')
   }
   useEffect(() => {
     if (!isTauriRuntime()) return
@@ -212,6 +224,8 @@ function MainApp() {
       if (payload.action === 'pause') actions.pauseTimer(payload.timerId)
       if (payload.action === 'resume') actions.resumeTimer(payload.timerId)
       if (payload.action === 'finish') actions.finishTimer(false, payload.timerId)
+      if (payload.action === 'reminder-continue') continueStopwatch()
+      if (payload.action === 'reminder-rest') actions.finishTimer(false, payload.timerId)
     }).then((stop) => { if (disposed) stop(); else unlisten = stop })
     return () => { disposed = true; unlisten?.() }
   }, [])
@@ -245,9 +259,10 @@ function MainApp() {
           phase: session.phase,
         })),
         theme: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light',
+        reminder: stopwatchReminder,
       }
       const width = activeSessions.length === 1 ? 220 : 240
-      const height = activeSessions.length === 1 ? 80 : Math.min(180, 38 + Math.min(activeSessions.length, 3) * 42)
+      const height = (activeSessions.length === 1 ? 80 : Math.min(180, 38 + Math.min(activeSessions.length, 3) * 42)) + (stopwatchReminder ? 92 : 0)
       if (widget) {
         await widget.setSize(new LogicalSize(width, height)).catch(() => undefined)
         const monitor = await currentMonitor()
@@ -288,14 +303,23 @@ function MainApp() {
     }
     void syncWidget().catch(() => undefined)
     return () => { cancelled = true }
-  }, [activeSessions, now, state.tasks, state.settings.theme, widgetReady])
+  }, [activeSessions, now, state.tasks, state.settings.theme, stopwatchReminder, widgetReady])
   useEffect(() => {
     if (!backgroundActive || backgroundActive.status !== 'running') return
     const elapsed = sessionElapsed(backgroundActive, now)
-    if (backgroundActive.mode === 'stopwatch') return
+    if (backgroundActive.mode === 'stopwatch' && backgroundActive.phase === 'focus') {
+      if (state.settings.phaseEndReminderEnabled && elapsed >= state.settings.stopwatchFocusMinutes * 60000 && !stopwatchReminderShown.current.has(backgroundActive.id)) {
+        stopwatchReminderShown.current.add(backgroundActive.id)
+        const taskTitle = state.tasks.find((task) => task.id === backgroundActive.taskId)?.title ?? '当前任务'
+        setStopwatchReminder({ timerId: backgroundActive.id, taskTitle, minutes: state.settings.stopwatchFocusMinutes })
+        setPhasePrompt('stopwatch-goal')
+      }
+      return
+    }
+    if (backgroundActive.mode === 'stopwatch' && backgroundActive.phase === 'short_break' && elapsed < state.settings.stopwatchBreakMinutes * 60000) return
     if (backgroundActive.mode === 'pomodoro' && backgroundActive.phase === 'focus' && elapsed < phaseDuration('focus', state.settings)) return
     if (backgroundActive.mode === 'pomodoro' && backgroundActive.phase !== 'focus' && elapsed < phaseDuration(backgroundActive.phase, state.settings)) return
-    const limit = phaseDuration(backgroundActive.phase, state.settings)
+    const limit = backgroundActive.mode === 'stopwatch' ? state.settings.stopwatchBreakMinutes * 60000 : phaseDuration(backgroundActive.phase, state.settings)
     const finished = { ...backgroundActive, accumulatedMs: limit, endedAt: new Date().toISOString(), status: 'completed' as const }
     const nextPhase: PomodoroPhase = backgroundActive.phase === 'focus'
       ? (backgroundActive.mode === 'pomodoro' && backgroundActive.pomodoroIndex % Math.max(1, state.settings.longBreakEvery) === 0 ? 'long_break' : 'short_break')
@@ -506,6 +530,7 @@ function TimerWidget() {
       <span>{timer.sessions.length} 个专注任务</span>
       <Clock3 size={16} />
     </div>
+    {timer.reminder && <div className="timer-widget-reminder" role="alert"><strong>已专注 {timer.reminder.minutes} 分钟</strong><span>{timer.reminder.taskTitle}：休息一下，还是继续正计时？</span><div><button onClick={() => sendAction(timer.reminder!.timerId, 'reminder-rest')}>休息</button><button onClick={() => sendAction(timer.reminder!.timerId, 'reminder-continue')}>继续</button></div></div>}
     <div className="timer-widget-list">
       {timer.sessions.map((session) => <div className="timer-widget-session" key={session.timerId} onClick={() => { if (isTauriRuntime()) void emit('timer-widget-select', { taskId: session.taskId }) }}>
         <div className="timer-widget-session-info" title={session.taskTitle}>

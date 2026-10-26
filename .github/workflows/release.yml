@@ -30,7 +30,7 @@ jobs:
           tauriScript: npm exec tauri --
           tagName: ${{ github.ref_name }}
           releaseName: ChronoDesk ${{ github.ref_name }}
-          releaseBody: 修复暂停按钮无响应，并移除正计时的45分钟自动提醒和休息切换。
+          releaseBody: 增加正计时阶段结束提醒，并在右下角悬浮计时器同步显示休息或继续选项。
           releaseDraft: false
           prerelease: false
           uploadUpdaterJson: true

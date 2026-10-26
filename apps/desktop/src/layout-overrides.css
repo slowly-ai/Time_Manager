@@ -1778,6 +1778,61 @@ body.timer-widget-body {
   color: #aaaaaa;
 }
 
+.timer-widget-reminder {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 8px;
+  padding: 10px;
+  border: 1px solid #e4b35f;
+  border-radius: 8px;
+  color: #3d2b10;
+  background: #fff6df;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.timer-widget-reminder strong {
+  font-size: 12px;
+}
+
+.timer-widget-reminder div {
+  display: flex;
+  gap: 6px;
+}
+
+.timer-widget-reminder button {
+  flex: 1;
+  min-height: 25px;
+  border: 1px solid #c98a2e;
+  border-radius: 6px;
+  color: #3d2b10;
+  background: #ffffff;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.timer-widget-reminder button:last-child {
+  color: #ffffff;
+  background: #171717;
+}
+
+.timer-widget-root[data-theme='dark'] .timer-widget-reminder {
+  border-color: #9a752e;
+  color: #f8e6bd;
+  background: #3a2e1b;
+}
+
+.timer-widget-root[data-theme='dark'] .timer-widget-reminder button {
+  border-color: #9a752e;
+  color: #f8e6bd;
+  background: #28231b;
+}
+
+.timer-widget-root[data-theme='dark'] .timer-widget-reminder button:last-child {
+  color: #171717;
+  background: #f8e6bd;
+}
+
 .timer-widget-root > strong {
   display: block;
   overflow: hidden;
