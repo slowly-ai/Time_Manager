@@ -30,7 +30,7 @@ jobs:
           tauriScript: npm exec tauri --
           tagName: ${{ github.ref_name }}
           releaseName: ChronoDesk ${{ github.ref_name }}
-          releaseBody: 增加正计时阶段结束提醒，并在右下角悬浮计时器同步显示休息或继续选项。
+          releaseBody: 修复每日任务显示历史累计时长的问题，预计时长继续使用任务创建或编辑后的设置。
           releaseDraft: false
           prerelease: false
           uploadUpdaterJson: true
