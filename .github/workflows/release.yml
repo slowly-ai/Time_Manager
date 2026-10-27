@@ -30,7 +30,7 @@ jobs:
           tauriScript: npm exec tauri --
           tagName: ${{ github.ref_name }}
           releaseName: ChronoDesk ${{ github.ref_name }}
-          releaseBody: 修复每日任务显示历史累计时长的问题，预计时长继续使用任务创建或编辑后的设置。
+          releaseBody: 修复右下角提醒文字显示，并保持悬浮窗口尺寸不变。
           releaseDraft: false
           prerelease: false
           uploadUpdaterJson: true

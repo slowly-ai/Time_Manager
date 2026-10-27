@@ -1780,15 +1780,15 @@ body.timer-widget-body {
 
 .timer-widget-reminder {
   display: grid;
-  gap: 6px;
-  margin: 10px 0 8px;
-  padding: 10px;
+  gap: 5px;
+  margin: 6px 0 0;
+  padding: 6px 8px;
   border: 1px solid #e4b35f;
   border-radius: 8px;
   color: #3d2b10;
   background: #fff6df;
   font-size: 11px;
-  line-height: 1.35;
+  line-height: 1.2;
 }
 
 .timer-widget-reminder strong {
@@ -1797,12 +1797,12 @@ body.timer-widget-body {
 
 .timer-widget-reminder div {
   display: flex;
-  gap: 6px;
+  gap: 5px;
 }
 
 .timer-widget-reminder button {
   flex: 1;
-  min-height: 25px;
+  min-height: 22px;
   border: 1px solid #c98a2e;
   border-radius: 6px;
   color: #3d2b10;

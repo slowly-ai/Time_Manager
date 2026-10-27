@@ -262,7 +262,7 @@ function MainApp() {
         reminder: stopwatchReminder,
       }
       const width = activeSessions.length === 1 ? 220 : 240
-      const height = (activeSessions.length === 1 ? 80 : Math.min(180, 38 + Math.min(activeSessions.length, 3) * 42)) + (stopwatchReminder ? 92 : 0)
+      const height = activeSessions.length === 1 ? 80 : Math.min(180, 38 + Math.min(activeSessions.length, 3) * 42)
       if (widget) {
         await widget.setSize(new LogicalSize(width, height)).catch(() => undefined)
         const monitor = await currentMonitor()
@@ -530,8 +530,7 @@ function TimerWidget() {
       <span>{timer.sessions.length} 个专注任务</span>
       <Clock3 size={16} />
     </div>
-    {timer.reminder && <div className="timer-widget-reminder" role="alert"><strong>已专注 {timer.reminder.minutes} 分钟</strong><span>{timer.reminder.taskTitle}：休息一下，还是继续正计时？</span><div><button onClick={() => sendAction(timer.reminder!.timerId, 'reminder-rest')}>休息</button><button onClick={() => sendAction(timer.reminder!.timerId, 'reminder-continue')}>继续</button></div></div>}
-    <div className="timer-widget-list">
+    {timer.reminder ? <div className="timer-widget-reminder" role="alert"><strong>已专注 {timer.reminder.minutes} 分钟</strong><div><button onClick={() => sendAction(timer.reminder!.timerId, 'reminder-rest')}>休息</button><button onClick={() => sendAction(timer.reminder!.timerId, 'reminder-continue')}>继续</button></div></div> : <div className="timer-widget-list">
       {timer.sessions.map((session) => <div className="timer-widget-session" key={session.timerId} onClick={() => { if (isTauriRuntime()) void emit('timer-widget-select', { taskId: session.taskId }) }}>
         <div className="timer-widget-session-info" title={session.taskTitle}>
           <strong>{session.taskTitle}</strong>
@@ -543,7 +542,7 @@ function TimerWidget() {
           <button className="timer-widget-finish" onClick={() => sendAction(session.timerId, 'finish')} aria-label={`结束并保存${session.taskTitle}`}><Check size={13} /></button>
         </div>
       </div>)}
-    </div>
+    </div>}
   </div>
 }
 
