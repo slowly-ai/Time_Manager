@@ -30,7 +30,7 @@ jobs:
           tauriScript: npm exec tauri --
           tagName: ${{ github.ref_name }}
           releaseName: ChronoDesk ${{ github.ref_name }}
-          releaseBody: 修复今日任务点击后右侧专注面板不切换的问题。
+          releaseBody: 每日完成任务显示当天已记录的专注时长，创建和编辑任务支持按需设置或取消预计时长。
           releaseDraft: false
           prerelease: false
           uploadUpdaterJson: true

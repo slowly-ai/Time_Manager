@@ -896,10 +896,11 @@ body,
 .recurrence-count { display: inline; margin-left: 8px; color: var(--muted); font-size: 9px; font-weight: 500; }
 .completed-task-panel { margin-top: 14px; padding: 18px 20px; background: var(--surface); border: 1px solid var(--line); }
 .completed-task-panel .section-heading { margin-bottom: 8px; }
-.completed-task-row { display: grid; grid-template-columns: 112px minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 42px; border-top: 1px solid var(--line); font-size: 10px; }
+.completed-task-row { display: grid; grid-template-columns: 112px minmax(0, 1fr) 140px auto; align-items: center; gap: 12px; min-height: 42px; border-top: 1px solid var(--line); font-size: 10px; }
 .completed-task-row > span { color: var(--muted); font-family: 'DM Mono', monospace; }
 .completed-task-row > strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .completed-task-row > small { color: var(--muted); }
+.completed-task-row > .completed-task-duration { color: var(--text); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .completed-task-heading-actions { display: inline-flex; align-items: center; gap: 12px; }
 .stats-page .bar-column {
   appearance: none;
@@ -1955,6 +1956,8 @@ body.timer-widget-body {
 .recurrence-toggle { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
 .recurrence-toggle input { width: 16px; height: 16px; accent-color: #171717; }
 .form-recurring { margin-top: 2px; }
+.estimated-duration-field { margin-bottom: 18px; }
+.estimated-duration-field .form-label { margin-top: 10px; margin-bottom: 0; }
 .duplicate-task-message { display: flex; flex-direction: column; gap: 8px; color: var(--muted); font-size: 13px; line-height: 1.6; }
 .duplicate-task-message strong { color: var(--text); font-size: 16px; }
 .duplicate-actions { display: flex; flex-direction: column; gap: 9px; margin-top: 22px; }

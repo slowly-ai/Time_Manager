@@ -23,7 +23,7 @@ export interface Task {
   priority: Priority
   recurrence: TaskRecurrence
   status: TaskStatus
-  plannedMs: number
+  plannedMs: number | null
   dueDate?: string
   sortOrder: number
   createdAt: string

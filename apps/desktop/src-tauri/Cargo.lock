@@ -339,7 +339,7 @@ dependencies = [
 
 [[package]]
 name = "chronodesk"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "serde_json",
  "tauri",
