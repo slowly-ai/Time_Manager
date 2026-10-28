@@ -128,7 +128,7 @@ function MainApp() {
   const activeSessions = state.sessions.filter((session) => session.status === 'running' || session.status === 'paused')
   const preferredActiveTaskId = view === 'today' ? todaySelectedTaskId : selectedTaskId
   const selectedSession = preferredActiveTaskId ? activeSessions.find((session) => session.taskId === preferredActiveTaskId) : undefined
-  const active = selectedSession ?? activeSessions.find((session) => session.id === activeTimerId) ?? activeSessions[0]
+  const active = preferredActiveTaskId ? selectedSession : activeSessions.find((session) => session.id === activeTimerId) ?? activeSessions[0]
   const backgroundActive = activeSessions.find((session) => session.id === activeTimerId) ?? activeSessions[0]
   const activeTask = state.tasks.find((task) => task.id === active?.taskId) ?? state.tasks.find((task) => task.id === preferredActiveTaskId)
   const todayStart = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime() }, [now])
