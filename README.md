@@ -75,3 +75,7 @@ ChronoDesk 是一款 Windows 桌面专注计时工具，支持任务管理、正
 ## 卸载
 
 在 Windows“设置 → 应用 → 已安装的应用”中找到 ChronoDesk 并卸载。卸载应用不会自动删除本地数据，卸载前可以先导出 JSON 备份。
+
+## 开源许可
+
+ChronoDesk 使用 MIT License，完整条款见仓库根目录的 [`LICENSE`](./LICENSE) 文件。
