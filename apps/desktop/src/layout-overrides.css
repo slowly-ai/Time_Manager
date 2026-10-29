@@ -2955,6 +2955,11 @@ body {
   white-space: nowrap;
 }
 
+.detail-panel .detail-delete-button {
+  display: flex;
+  margin-inline: auto;
+}
+
 /* Keep project menu rows on one stable center line. */
 .project-menu {
   box-sizing: border-box;
