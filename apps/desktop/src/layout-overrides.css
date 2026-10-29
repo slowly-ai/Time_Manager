@@ -1036,7 +1036,6 @@ body {
 .nav-item:hover,
 .nav-item.selected,
 .project-link:hover,
-.task-row:hover,
 .task-row.selected,
 .secondary-button:hover,
 .project-menu button:hover,
@@ -1695,11 +1694,24 @@ body {
   border-color: var(--text);
 }
 
-.task-done {
-  background: color-mix(in srgb, var(--surface-soft) 64%, var(--surface));
+.task-created-at {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 12px;
 }
 
-.task-done:hover,
+.task-created-at time {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.task-done {
+  background: var(--surface);
+}
+
 .task-done.selected {
   background: var(--surface-soft);
 }

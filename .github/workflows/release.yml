@@ -30,7 +30,7 @@ jobs:
           tauriScript: npm exec tauri --
           tagName: ${{ github.ref_name }}
           releaseName: ChronoDesk ${{ github.ref_name }}
-          releaseBody: 每日完成任务显示当天已记录的专注时长，创建和编辑任务支持按需设置或取消预计时长。
+          releaseBody: 任务行默认白底、点击选中后变灰；所有任务中未完成任务优先，已完成任务按完成时间从新到旧排列；任务详情新增创建时间。
           releaseDraft: false
           prerelease: false
           uploadUpdaterJson: true
