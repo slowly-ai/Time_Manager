@@ -30,7 +30,7 @@ jobs:
           tauriScript: npm exec tauri --
           tagName: ${{ github.ref_name }}
           releaseName: ChronoDesk ${{ github.ref_name }}
-          releaseBody: 任务详情的删除任务按钮居中；所有任务页面点击空白处可取消选择并收起详情。
+          releaseBody: 普通任务和长期任务都支持添加到今日任务；任务详情可查看创建时间。
           releaseDraft: false
           prerelease: false
           uploadUpdaterJson: true
