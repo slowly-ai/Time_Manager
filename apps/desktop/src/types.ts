@@ -203,8 +203,7 @@ export function tomorrowKey(now = Date.now()) {
 
 export function isTaskVisibleToday(task: Pick<Task, 'recurrence' | 'todayAddedOn' | 'todayDismissedOn'>, day = todayKey()) {
   if (task.todayDismissedOn === day) return false
-  if (task.recurrence === 'daily') return task.todayAddedOn === day
-  return !task.todayAddedOn || task.todayAddedOn === day
+  return task.todayAddedOn === day
 }
 
 export function isTaskCompletedOnDay(taskId: string, completions: TaskCompletion[], day = todayKey()) {
@@ -294,17 +293,6 @@ export function mergeDuplicateTasks(state: ChronoState): ChronoState {
   }
 }
 
-export function rolloverRecurringTasks(state: ChronoState, now = Date.now()): ChronoState {
-  const today = new Date(now)
-  today.setHours(0, 0, 0, 0)
-  const todayStart = today.getTime()
-  let changed = false
-  const tasks = state.tasks.map((task) => {
-    if (task.recurrence !== 'daily') return task
-    const day = todayKey(now)
-    if (task.todayDismissedOn === day || (task.todayAddedOn && task.todayAddedOn >= day)) return task
-    changed = true
-    return { ...task, todayAddedOn: day, todayDismissedOn: undefined, status: 'todo' as const, completedAt: undefined, updatedAt: new Date(now).toISOString() }
-  })
-  return changed ? { ...state, tasks } : state
+export function rolloverRecurringTasks(state: ChronoState, _now = Date.now()): ChronoState {
+  return state
 }

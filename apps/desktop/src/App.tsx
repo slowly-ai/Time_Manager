@@ -335,8 +335,7 @@ function MainApp() {
     const existing = recurringTask ?? matches[0]
     if (existing && !force) { setDuplicateCandidate({ draft, existing, recurringExists: Boolean(recurringTask) }); setModal(null); return }
     const iso = new Date().toISOString()
-    const addedToToday = view === 'today'
-    const task: Task = { id: createId('task'), title: draft.title, description: '', projectId: draft.projectId, priority: draft.priority, recurrence: draft.recurrence, status: 'todo', plannedMs: draft.plannedMinutes === null ? null : draft.plannedMinutes * 60000, sortOrder: state.tasks.length, createdAt: iso, updatedAt: iso, todayAddedOn: addedToToday ? dayKey : undefined, todayDismissedOn: addedToToday ? undefined : dayKey }
+    const task: Task = { id: createId('task'), title: draft.title, description: '', projectId: draft.projectId, priority: draft.priority, recurrence: draft.recurrence, status: 'todo', plannedMs: draft.plannedMinutes === null ? null : draft.plannedMinutes * 60000, sortOrder: state.tasks.length, createdAt: iso, updatedAt: iso }
     update((current) => ({ ...current, tasks: [...current.tasks, task] }))
     setSelectedTaskId(task.id); setModal(null); setDuplicateCandidate(undefined); notify('任务已创建')
     if (view === 'tasks' && draft.recurrence === 'none') setConfirmDialog({ title: '加入今天的任务？', message: '这个普通任务已创建。是否将它加入今天的任务列表？', cancelLabel: '否', confirmLabel: '是', onConfirm: () => { addToToday(task.id); notify('任务已加入今天') } })
@@ -345,7 +344,7 @@ function MainApp() {
     if (!duplicateCandidate) return
     const { existing } = duplicateCandidate
     const iso = new Date().toISOString()
-    update((current) => ({ ...current, tasks: current.tasks.map((task) => task.id === existing.id ? { ...task, ...(asRecurring ? { recurrence: 'daily' as const, status: 'todo' as const, completedAt: undefined, todayAddedOn: view === 'today' ? dayKey : undefined, todayDismissedOn: view === 'today' ? undefined : dayKey } : {}), updatedAt: iso } : task) }))
+    update((current) => ({ ...current, tasks: current.tasks.map((task) => task.id === existing.id ? { ...task, ...(asRecurring ? { recurrence: 'daily' as const, status: 'todo' as const, completedAt: undefined, todayAddedOn: undefined, todayDismissedOn: undefined } : {}), updatedAt: iso } : task) }))
     setSelectedTaskId(existing.id); setDuplicateCandidate(undefined); notify(asRecurring ? '已将任务设为长期任务，已加入今日任务' : '已复用已有任务')
   }
   function saveProject(draft: ProjectDraft) {
