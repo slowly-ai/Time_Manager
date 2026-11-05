@@ -30,7 +30,7 @@ jobs:
           tauriScript: npm exec tauri --
           tagName: ${{ github.ref_name }}
           releaseName: ChronoDesk ${{ github.ref_name }}
-          releaseBody: 今日工作台的快速新增和新建任务会直接加入今日清单，支持普通任务和长期任务；所有任务中的新建保持手动添加。
+          releaseBody: 所有任务中的未完成任务按项目集中排列；项目管理支持拖动任务或使用 Alt 加上下方向键调整同项目任务顺序，并自动保存。
           releaseDraft: false
           prerelease: false
           uploadUpdaterJson: true

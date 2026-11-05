@@ -688,7 +688,7 @@ body,
 
 .project-task-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: 13px minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 8px;
   min-height: 31px;
@@ -697,7 +697,14 @@ body,
   background: var(--surface-soft);
   border-radius: 5px;
   text-align: left;
+  cursor: grab;
 }
+
+.project-task-row:active { cursor: grabbing; }
+.project-task-grip { color: var(--weak); pointer-events: none; }
+.project-task-row.dragging { opacity: .45; }
+.project-task-row.drag-over { outline: 1px solid var(--accent); background: var(--accent-soft); }
+.project-task-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 .project-task-row:hover {
   background: var(--accent-soft);
